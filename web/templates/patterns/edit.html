@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ pattern.pattern_name }} · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <p class="breadcrumb"><a href="{{ url_for('patterns.detail', pattern_id=pattern.id) }}">← {{ pattern.pattern_name }}</a></p>
+  <h1 class="page-title">Edit pattern</h1>
+  <form method="post" action="{{ url_for('patterns.update', pattern_id=pattern.id) }}" class="form">
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="brand">Brand</label>
+        <input class="form__input" type="text" id="brand" name="brand" value="{{ pattern.brand or '' }}" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="pattern_name">Pattern name</label>
+        <input class="form__input" type="text" id="pattern_name" name="pattern_name" value="{{ pattern.pattern_name }}" required />
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="size_chosen">Size chosen</label>
+        <input class="form__input" type="text" id="size_chosen" name="size_chosen" value="{{ pattern.size_chosen or '' }}" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="view_version">View</label>
+        <input class="form__input" type="text" id="view_version" name="view_version" value="{{ pattern.view_version or '' }}" />
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="notes">Notes</label>
+      <textarea class="form__textarea" id="notes" name="notes" rows="4">{{ pattern.notes or '' }}</textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="instructions_rating">Instructions rating (1–5)</label>
+      <select class="form__input" id="instructions_rating" name="instructions_rating">
+        {% for i in [1,2,3,4,5] %}
+        <option value="{{ i }}" {% if pattern.instructions_rating == i %}selected{% endif %}>{{ i }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Save changes</button>
+      <a href="{{ url_for('patterns.detail', pattern_id=pattern.id) }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

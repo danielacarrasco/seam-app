@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Stash · Seam{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Stash</h1>
+  <a href="{{ url_for('stash.new') }}" class="btn btn--primary">+ Log fabric</a>
+</div>
+<form class="filter-bar" method="get">
+  <select name="fiber" class="filter-select">
+    <option value="">All fibres</option>
+    {% for f in ['cotton','linen','wool','silk','synthetic','blend'] %}
+    <option value="{{ f }}" {% if filters.get('fiber') == f %}selected{% endif %}>{{ f | title }}</option>
+    {% endfor %}
+  </select>
+  <select name="structure" class="filter-select">
+    <option value="">Any structure</option>
+    {% for s in ['drapey','light structure','crisp','stiff'] %}
+    <option value="{{ s }}" {% if filters.get('structure') == s %}selected{% endif %}>{{ s | title }}</option>
+    {% endfor %}
+  </select>
+  <select name="reserved" class="filter-select">
+    <option value="">All</option>
+    <option value="false" {% if filters.get('reserved') == 'false' %}selected{% endif %}>Available</option>
+    <option value="true" {% if filters.get('reserved') == 'true' %}selected{% endif %}>Reserved</option>
+  </select>
+  <select name="suitable_for" class="filter-select">
+    <option value="">Any garment</option>
+    {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt'] %}
+    <option value="{{ t }}" {% if filters.get('suitable_for') == t %}selected{% endif %}>{{ t | title }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn--secondary">Filter</button>
+  {% if filters %}<a href="{{ url_for('stash.index') }}" class="btn btn--ghost">Clear</a>{% endif %}
+</form>
+{% if fabrics %}
+  <div class="fabric-grid">
+    {% for fabric in fabrics %}{% include 'partials/fabric_card.html' with context %}{% endfor %}
+  </div>
+{% else %}
+  {% set message = "Your stash is empty — log your first fabric." %}
+  {% set cta_url = url_for('stash.new') %}
+  {% set cta_label = "+ Log fabric" %}
+  {% include 'partials/empty_state.html' %}
+{% endif %}
+{% endblock %}

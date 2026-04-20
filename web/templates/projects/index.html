@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Projects · Seam{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Projects</h1>
+  <a href="{{ url_for('projects.new') }}" class="btn btn--primary">+ New project</a>
+</div>
+<form class="filter-bar" method="get">
+  <select name="status" class="filter-select">
+    <option value="">All statuses</option>
+    {% for s in ['idea','planned','sourcing','cutting','sewing','finished','paused','abandoned'] %}
+    <option value="{{ s }}" {% if filters.get('status') == s %}selected{% endif %}>{{ s | title }}</option>
+    {% endfor %}
+  </select>
+  <select name="garment_type" class="filter-select">
+    <option value="">All types</option>
+    {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','other'] %}
+    <option value="{{ t }}" {% if filters.get('garment_type') == t %}selected{% endif %}>{{ t | title }}</option>
+    {% endfor %}
+  </select>
+  <select name="season" class="filter-select">
+    <option value="">All seasons</option>
+    {% for s in ['spring','summer','autumn','winter','year-round'] %}
+    <option value="{{ s }}" {% if filters.get('season') == s %}selected{% endif %}>{{ s | title }}</option>
+    {% endfor %}
+  </select>
+  <select name="priority" class="filter-select">
+    <option value="">Any priority</option>
+    {% for p in ['high','medium','low'] %}
+    <option value="{{ p }}" {% if filters.get('priority') == p %}selected{% endif %}>{{ p | title }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn--secondary">Filter</button>
+  {% if filters %}<a href="{{ url_for('projects.index') }}" class="btn btn--ghost">Clear</a>{% endif %}
+</form>
+{% if projects %}
+  <div class="card-grid">
+    {% for project in projects %}
+    <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="project-card project-card--grid">
+      <div class="project-card__header">
+        {% set status = project.status %}
+        {% include 'partials/status_chip.html' with context %}
+        {% if project.priority == 'high' %}<span class="chip chip--priority">High</span>{% endif %}
+      </div>
+      <div class="project-card__body">
+        <p class="project-card__name">{{ project.title }}</p>
+        <p class="project-card__meta">{{ project.garment_type | title if project.garment_type }}{% if project.season %} · {{ project.season | title }}{% endif %}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% else %}
+  {% set message = "No projects yet — add your first idea." %}
+  {% set cta_url = url_for('projects.new') %}
+  {% set cta_label = "+ New project" %}
+  {% include 'partials/empty_state.html' %}
+{% endif %}
+{% endblock %}

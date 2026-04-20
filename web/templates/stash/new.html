@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Log fabric · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <h1 class="page-title">Log a fabric</h1>
+  <form method="post" action="{{ url_for('stash.create') }}" class="form" enctype="multipart/form-data">
+    <div class="form__field">
+      <label class="form__label">Photo</label>
+      <div class="photo-upload">
+        <input type="file" name="photo" id="photo" accept="image/*" class="photo-upload__input" />
+        <label for="photo" class="photo-upload__label">Tap to add a photo</label>
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="nickname">Nickname</label>
+      <input class="form__input" type="text" id="nickname" name="nickname" required placeholder="e.g. The dusty sage linen" autofocus />
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="fiber_content">Fibre</label>
+        <select class="form__input" id="fiber_content" name="fiber_content">
+          <option value="">Select…</option>
+          {% for f in ['cotton','linen','wool','silk','synthetic','blend','other'] %}
+          <option value="{{ f }}">{{ f | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="drape_structure">Structure</label>
+        <select class="form__input" id="drape_structure" name="drape_structure">
+          <option value="">Select…</option>
+          {% for s in ['drapey','light structure','crisp','stiff'] %}
+          <option value="{{ s }}">{{ s | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="length_meters">Length (m)</label>
+        <input class="form__input" type="number" step="0.1" id="length_meters" name="length_meters" placeholder="3.0" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="width_cm">Width (cm)</label>
+        <input class="form__input" type="number" id="width_cm" name="width_cm" placeholder="150" />
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="color">Colour</label>
+        <input class="form__input" type="text" id="color" name="color" placeholder="e.g. sage green" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="weight_gsm">Weight (GSM)</label>
+        <input class="form__input" type="number" id="weight_gsm" name="weight_gsm" placeholder="optional" />
+      </div>
+    </div>
+    <div class="form__field form__field--inline">
+      <input type="checkbox" id="stretch" name="stretch" class="form__checkbox" />
+      <label class="form__label form__label--inline" for="stretch">Has stretch</label>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="source_store">Source / store</label>
+        <input class="form__input" type="text" id="source_store" name="source_store" placeholder="e.g. Tessuti Fabrics" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="cost">Cost</label>
+        <input class="form__input" type="text" id="cost" name="cost" placeholder="e.g. $28/m" />
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="date_acquired">Date acquired</label>
+      <input class="form__input" type="date" id="date_acquired" name="date_acquired" />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="care_instructions">Care instructions</label>
+      <input class="form__input" type="text" id="care_instructions" name="care_instructions" placeholder="e.g. Hand wash cold, dry flat" />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="notes">Notes</label>
+      <textarea class="form__textarea" id="notes" name="notes" rows="3" placeholder="Hand feel, sewing behaviour, opacity notes…"></textarea>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Save to stash</button>
+      <a href="{{ url_for('stash.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

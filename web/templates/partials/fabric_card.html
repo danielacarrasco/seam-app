@@ -1,0 +1,16 @@
+<a href="{{ url_for('stash.detail', fabric_id=fabric.id) }}" class="fabric-card">
+  <div class="fabric-card__swatch" {% if fabric.color %}style="background: {{ fabric.color }}"{% endif %}>
+    {% if not fabric.photo_url %}
+      <span class="fabric-card__initial">{{ fabric.nickname[0] | upper }}</span>
+    {% else %}
+      <img src="{{ fabric.photo_url }}" alt="{{ fabric.nickname }}" class="fabric-card__img" />
+    {% endif %}
+  </div>
+  <div class="fabric-card__body">
+    <p class="fabric-card__name">{{ fabric.nickname }}</p>
+    <p class="fabric-card__meta">{{ fabric.fiber_content }} · {{ fabric.length_meters }}m</p>
+    <span class="chip chip--{{ 'reserved' if fabric.reserved else 'available' }}">
+      {{ 'Reserved' if fabric.reserved else 'Available' }}
+    </span>
+  </div>
+</a>

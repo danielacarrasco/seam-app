@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Edit make · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <p class="breadcrumb"><a href="{{ url_for('makes.detail', make_id=make.id) }}">← Make</a></p>
+  <h1 class="page-title">Edit make</h1>
+  <form method="post" action="{{ url_for('makes.update', make_id=make.id) }}" class="form">
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="fit_outcome">Fit outcome</label>
+        <select class="form__input" id="fit_outcome" name="fit_outcome">
+          <option value="good" {% if make.fit_outcome == 'good' %}selected{% endif %}>Good fit</option>
+          <option value="needs_adjustment" {% if make.fit_outcome == 'needs_adjustment' %}selected{% endif %}>Needs adjustment</option>
+          <option value="poor" {% if make.fit_outcome == 'poor' %}selected{% endif %}>Poor fit</option>
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="wear_frequency">Wear frequency</label>
+        <select class="form__input" id="wear_frequency" name="wear_frequency">
+          {% for w in ['daily','weekly','occasional','rarely'] %}
+          <option value="{{ w }}" {% if make.wear_frequency == w %}selected{% endif %}>{{ w | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form__field form__field--inline">
+      <input type="checkbox" id="would_remake" name="would_remake" class="form__checkbox" {% if make.would_remake %}checked{% endif %} />
+      <label class="form__label form__label--inline" for="would_remake">I would make this again</label>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="what_worked">What worked</label>
+      <textarea class="form__textarea" id="what_worked" name="what_worked" rows="2">{{ make.what_worked or '' }}</textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="what_didnt">What didn't work</label>
+      <textarea class="form__textarea" id="what_didnt" name="what_didnt" rows="2">{{ make.what_didnt or '' }}</textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="lessons_learned">Lessons learned</label>
+      <textarea class="form__textarea" id="lessons_learned" name="lessons_learned" rows="3">{{ make.lessons_learned or '' }}</textarea>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Save changes</button>
+      <a href="{{ url_for('makes.detail', make_id=make.id) }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

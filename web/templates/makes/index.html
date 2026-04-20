@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Makes · Seam{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Makes</h1>
+  <a href="{{ url_for('makes.new') }}" class="btn btn--primary">+ Archive make</a>
+</div>
+
+{% if insights %}
+<div class="insights-bar">
+  <div class="insight">
+    <span class="insight__num">{{ insights.total_makes }}</span>
+    <span class="insight__label">total makes</span>
+  </div>
+  <div class="insight">
+    <span class="insight__num">{{ (insights.would_remake_rate * 100) | round | int }}%</span>
+    <span class="insight__label">would remake</span>
+  </div>
+  <div class="insight">
+    <span class="insight__num">{{ insights.fit_outcome_breakdown.good }}</span>
+    <span class="insight__label">good fit</span>
+  </div>
+</div>
+{% endif %}
+
+<form class="filter-bar" method="get">
+  <select name="garment_type" class="filter-select">
+    <option value="">All types</option>
+    {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','other'] %}
+    <option value="{{ t }}" {% if filters.get('garment_type') == t %}selected{% endif %}>{{ t | title }}</option>
+    {% endfor %}
+  </select>
+  <select name="fit_outcome" class="filter-select">
+    <option value="">Any fit</option>
+    <option value="good" {% if filters.get('fit_outcome') == 'good' %}selected{% endif %}>Good fit</option>
+    <option value="needs_adjustment" {% if filters.get('fit_outcome') == 'needs_adjustment' %}selected{% endif %}>Needs adjustment</option>
+    <option value="poor" {% if filters.get('fit_outcome') == 'poor' %}selected{% endif %}>Poor fit</option>
+  </select>
+  <select name="would_remake" class="filter-select">
+    <option value="">All</option>
+    <option value="true" {% if filters.get('would_remake') == 'true' %}selected{% endif %}>Would remake</option>
+    <option value="false" {% if filters.get('would_remake') == 'false' %}selected{% endif %}>Would not remake</option>
+  </select>
+  <input type="number" name="year" class="filter-input filter-input--narrow" placeholder="Year" value="{{ filters.get('year','') }}" />
+  <button type="submit" class="btn btn--secondary">Filter</button>
+  {% if filters %}<a href="{{ url_for('makes.index') }}" class="btn btn--ghost">Clear</a>{% endif %}
+</form>
+
+{% if makes %}
+  <div class="makes-grid">
+    {% for make in makes %}
+    <a href="{{ url_for('makes.detail', make_id=make.id) }}" class="make-card">
+      <div class="make-card__img-box">
+        {% if make.cover_photo_url %}
+          <img src="{{ make.cover_photo_url }}" alt="{{ make.project.title if make.project else 'Make' }}" class="make-card__img" />
+        {% else %}
+          <div class="make-card__placeholder"></div>
+        {% endif %}
+      </div>
+      <div class="make-card__body">
+        <p class="make-card__name">{{ make.project.title if make.project else 'Untitled make' }}</p>
+        <p class="make-card__meta">{{ make.created_at }}</p>
+        <div class="make-card__chips">
+          {% if make.fit_outcome %}<span class="chip chip--fit-{{ make.fit_outcome }}">{{ make.fit_outcome | replace('_', ' ') | title }}</span>{% endif %}
+          {% if make.would_remake %}<span class="chip chip--available chip--sm">Would remake</span>{% endif %}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% else %}
+  {% set message = "No makes archived yet — finish something and celebrate it." %}
+  {% set cta_url = url_for('makes.new') %}
+  {% set cta_label = "+ Archive a make" %}
+  {% include 'partials/empty_state.html' %}
+{% endif %}
+{% endblock %}

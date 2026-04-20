@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} · Seam{% endblock %}
+{% block content %}
+<div class="detail-page">
+  <div class="detail-page__header">
+    <div>
+      <p class="breadcrumb"><a href="{{ url_for('projects.index') }}">Projects</a></p>
+      <h1 class="page-title">{{ project.title }}</h1>
+      <div class="chip-row">
+        {% set status = project.status %}
+        {% include 'partials/status_chip.html' with context %}
+        {% if project.garment_type %}<span class="chip chip--neutral">{{ project.garment_type | title }}</span>{% endif %}
+        {% if project.season %}<span class="chip chip--neutral">{{ project.season | title }}</span>{% endif %}
+        {% if project.priority == 'high' %}<span class="chip chip--priority">High priority</span>{% endif %}
+      </div>
+    </div>
+    <div class="detail-page__actions">
+      <a href="{{ url_for('projects.edit', project_id=project.id) }}" class="btn btn--secondary">Edit</a>
+      <form method="post" action="{{ url_for('projects.delete', project_id=project.id) }}" onsubmit="return confirm('Delete this project?')">
+        <button type="submit" class="btn btn--danger">Delete</button>
+      </form>
+    </div>
+  </div>
+  <div class="detail-page__body">
+    <div class="detail-page__main">
+      {% if project.notes %}
+      <section class="detail-section">
+        <h2 class="section-label">Notes</h2>
+        <div class="prose">{{ project.notes }}</div>
+      </section>
+      {% endif %}
+      {% if project.fit_considerations %}
+      <section class="detail-section">
+        <h2 class="section-label">Fit considerations</h2>
+        <div class="prose">{{ project.fit_considerations }}</div>
+      </section>
+      {% endif %}
+      <section class="detail-section">
+        <h2 class="section-label">Progress log</h2>
+        {% if log %}
+        <ol class="log">
+          {% for entry in log %}
+          <li class="log__entry">
+            <div class="log__dot"></div>
+            <div class="log__content">
+              <p class="log__date">{{ entry.created_at }}</p>
+              <p class="log__note">{{ entry.note }}</p>
+              <form method="post" action="{{ url_for('projects.delete_log', project_id=project.id, entry_id=entry.id) }}">
+                <button type="submit" class="btn-inline btn-inline--danger">Remove</button>
+              </form>
+            </div>
+          </li>
+          {% endfor %}
+        </ol>
+        {% else %}
+          <p class="muted">No entries yet.</p>
+        {% endif %}
+        <form method="post" action="{{ url_for('projects.add_log', project_id=project.id) }}" class="log-form">
+          <textarea name="note" class="form__input form__textarea" rows="2" placeholder="What did you work on today?"></textarea>
+          <button type="submit" class="btn btn--primary">Add entry</button>
+        </form>
+      </section>
+    </div>
+    <aside class="detail-page__sidebar">
+      <section class="detail-section">
+        <h2 class="section-label">Fabrics</h2>
+        {% if project.fabrics %}
+          {% for fabric in project.fabrics %}
+            {% include 'partials/fabric_card.html' with context %}
+            <form method="post" action="{{ url_for('projects.unlink_fabric', project_id=project.id, fabric_id=fabric.id) }}">
+              <button type="submit" class="btn-inline btn-inline--danger">Unlink</button>
+            </form>
+          {% endfor %}
+        {% else %}
+          <p class="muted">No fabrics linked.</p>
+        {% endif %}
+        <a href="{{ url_for('stash.index') }}" class="btn btn--secondary btn--sm">Browse stash →</a>
+      </section>
+      <section class="detail-section">
+        <h2 class="section-label">Pattern</h2>
+        {% if project.pattern %}
+          <div class="pattern-ref">
+            <a href="{{ url_for('patterns.detail', pattern_id=project.pattern.id) }}" class="pattern-ref__name">{{ project.pattern.pattern_name }}</a>
+            <p class="pattern-ref__meta">{{ project.pattern.brand }} · {{ project.pattern.size_chosen }}</p>
+            <form method="post" action="{{ url_for('projects.remove_pattern', project_id=project.id) }}">
+              <button type="submit" class="btn-inline btn-inline--danger">Remove</button>
+            </form>
+          </div>
+        {% else %}
+          <p class="muted">No pattern linked.</p>
+          <a href="{{ url_for('patterns.index') }}" class="btn btn--secondary btn--sm">Browse patterns →</a>
+        {% endif %}
+      </section>
+      <section class="detail-section">
+        <h2 class="section-label">Details</h2>
+        <dl class="detail-list">
+          {% if project.difficulty %}<dt>Difficulty</dt><dd>{{ project.difficulty | title }}</dd>{% endif %}
+          {% if project.estimated_meterage %}<dt>Estimated meterage</dt><dd>{{ project.estimated_meterage }}m</dd>{% endif %}
+          {% if project.occasion %}<dt>Occasion</dt><dd>{{ project.occasion }}</dd>{% endif %}
+        </dl>
+      </section>
+    </aside>
+  </div>
+</div>
+{% endblock %}

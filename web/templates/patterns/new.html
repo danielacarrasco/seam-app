@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Add pattern · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <h1 class="page-title">Add a pattern</h1>
+  <form method="post" action="{{ url_for('patterns.create') }}" class="form" enctype="multipart/form-data">
+    <div class="form__field">
+      <label class="form__label">Envelope image</label>
+      <div class="photo-upload">
+        <input type="file" name="image" id="image" accept="image/*" class="photo-upload__input" />
+        <label for="image" class="photo-upload__label">Tap to add envelope image</label>
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="brand">Brand</label>
+        <input class="form__input" type="text" id="brand" name="brand" placeholder="e.g. Named Patterns" autofocus />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="designer">Designer</label>
+        <input class="form__input" type="text" id="designer" name="designer" placeholder="optional" />
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="pattern_name">Pattern name</label>
+        <input class="form__input" type="text" id="pattern_name" name="pattern_name" required placeholder="e.g. Florence Coat" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="pattern_number">Pattern number</label>
+        <input class="form__input" type="text" id="pattern_number" name="pattern_number" placeholder="e.g. B6748" />
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="garment_type">Garment type</label>
+        <select class="form__input" id="garment_type" name="garment_type">
+          <option value="">Select…</option>
+          {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','other'] %}
+          <option value="{{ t }}">{{ t | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="view_version">View / version</label>
+        <input class="form__input" type="text" id="view_version" name="view_version" placeholder="e.g. View A" />
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="size_chosen">Size chosen</label>
+        <input class="form__input" type="text" id="size_chosen" name="size_chosen" placeholder="e.g. 14" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="size_range">Size range</label>
+        <input class="form__input" type="text" id="size_range" name="size_range" placeholder="e.g. 6–20" />
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="recommended_fabrics">Recommended fabrics</label>
+      <input class="form__input" type="text" id="recommended_fabrics" name="recommended_fabrics" placeholder="e.g. Wool coating, heavy linen" />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="instructions_rating">Instructions rating (1–5)</label>
+      <select class="form__input" id="instructions_rating" name="instructions_rating">
+        <option value="">Select…</option>
+        {% for i in [1,2,3,4,5] %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="notes">Notes</label>
+      <textarea class="form__textarea" id="notes" name="notes" rows="3" placeholder="First impressions, grading notes, where you bought it…"></textarea>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Add to library</button>
+      <a href="{{ url_for('patterns.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

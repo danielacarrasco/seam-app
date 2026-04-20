@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Home · Seam{% endblock %}
+{% block content %}
+<section class="dashboard">
+  <header class="dashboard__header">
+    <h1 class="dashboard__greeting">Good {{ time_of_day }}.</h1>
+    <a href="{{ url_for('projects.new') }}" class="btn btn--primary">+ Quick add</a>
+  </header>
+
+  {% if active_projects %}
+  <div class="dashboard__section">
+    <h2 class="section-label">In progress</h2>
+    <div class="project-scroll">
+      {% for project in active_projects %}
+      <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="project-card">
+        <div class="project-card__header">
+          {% set status = project.status %}
+          {% include 'partials/status_chip.html' with context %}
+        </div>
+        <div class="project-card__body">
+          <p class="project-card__name">{{ project.title }}</p>
+          <p class="project-card__meta">{{ project.garment_type }}</p>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="dashboard__grid">
+    <div class="dashboard__section">
+      <h2 class="section-label">Stash</h2>
+      <div class="stat-card">
+        <div class="stat-card__row">
+          <div class="stat">
+            <span class="stat__num">{{ stash_summary.total or 0 }}</span>
+            <span class="stat__label">fabrics</span>
+          </div>
+          <div class="stat">
+            <span class="stat__num">{{ stash_summary.reserved or 0 }}</span>
+            <span class="stat__label">reserved</span>
+          </div>
+          <div class="stat">
+            <span class="stat__num">{{ stash_summary.available or 0 }}</span>
+            <span class="stat__label">available</span>
+          </div>
+        </div>
+        <a href="{{ url_for('stash.index') }}" class="stat-card__link">Browse stash →</a>
+      </div>
+    </div>
+    <div class="dashboard__section">
+      <h2 class="section-label">Recent ideas</h2>
+      {% if ideas %}
+        <ul class="idea-list">
+          {% for project in ideas %}
+          <li class="idea-list__item">
+            <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="idea-list__link">
+              <span class="idea-list__name">{{ project.title }}</span>
+              <span class="idea-list__meta">{{ project.garment_type }}</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">No ideas yet. <a href="{{ url_for('projects.new') }}">Add one</a>.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if recent_fabrics or recent_patterns %}
+  <div class="dashboard__section">
+    <h2 class="section-label">Recently added</h2>
+    <div class="recent-row">
+      {% for fabric in recent_fabrics %}{% include 'partials/fabric_card.html' with context %}{% endfor %}
+      {% for pattern in recent_patterns %}
+      <a href="{{ url_for('patterns.detail', pattern_id=pattern.id) }}" class="mini-card">
+        <p class="mini-card__label">Pattern</p>
+        <p class="mini-card__name">{{ pattern.pattern_name }}</p>
+        <p class="mini-card__meta">{{ pattern.brand }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

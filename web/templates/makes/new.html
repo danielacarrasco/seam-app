@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Archive a make · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <h1 class="page-title">Archive a make</h1>
+  <form method="post" action="{{ url_for('makes.create') }}" class="form" enctype="multipart/form-data">
+    <div class="form__field">
+      <label class="form__label">Photos</label>
+      <div class="photo-upload">
+        <input type="file" name="photos" id="photos" accept="image/*" multiple class="photo-upload__input" />
+        <label for="photos" class="photo-upload__label">Add photos (select multiple)</label>
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="project_id">Project</label>
+      <select class="form__input" id="project_id" name="project_id">
+        <option value="">Select a project…</option>
+        {% for project in projects %}
+        <option value="{{ project.id }}">{{ project.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="fit_outcome">Fit outcome</label>
+        <select class="form__input" id="fit_outcome" name="fit_outcome">
+          <option value="">Select…</option>
+          <option value="good">Good fit</option>
+          <option value="needs_adjustment">Needs adjustment</option>
+          <option value="poor">Poor fit</option>
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="wear_frequency">Wear frequency</label>
+        <select class="form__input" id="wear_frequency" name="wear_frequency">
+          <option value="">Select…</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="occasional">Occasional</option>
+          <option value="rarely">Rarely</option>
+        </select>
+      </div>
+    </div>
+    <div class="form__field form__field--inline">
+      <input type="checkbox" id="would_remake" name="would_remake" class="form__checkbox" />
+      <label class="form__label form__label--inline" for="would_remake">I would make this again</label>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="what_worked">What worked</label>
+      <textarea class="form__textarea" id="what_worked" name="what_worked" rows="2" placeholder="Techniques, construction choices, fabric behaviour…"></textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="what_didnt">What didn't work</label>
+      <textarea class="form__textarea" id="what_didnt" name="what_didnt" rows="2" placeholder="Fit issues, things to change next time…"></textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="lessons_learned">Lessons learned</label>
+      <textarea class="form__textarea" id="lessons_learned" name="lessons_learned" rows="3" placeholder="What would you do differently? What did you discover?"></textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="construction_notes">Construction notes</label>
+      <textarea class="form__textarea" id="construction_notes" name="construction_notes" rows="3" placeholder="Seam finishes, interfacing choices, order of operations…"></textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="care_outcome">Care outcome</label>
+      <input class="form__input" type="text" id="care_outcome" name="care_outcome" placeholder="e.g. Washed well, colours held" />
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Archive make</button>
+      <a href="{{ url_for('makes.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

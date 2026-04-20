@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Edit {{ project.title }} · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <p class="breadcrumb"><a href="{{ url_for('projects.detail', project_id=project.id) }}">← {{ project.title }}</a></p>
+  <h1 class="page-title">Edit project</h1>
+  <form method="post" action="{{ url_for('projects.update', project_id=project.id) }}" class="form">
+    <div class="form__field">
+      <label class="form__label" for="title">Title</label>
+      <input class="form__input" type="text" id="title" name="title" value="{{ project.title }}" required />
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="garment_type">Garment type</label>
+        <select class="form__input" id="garment_type" name="garment_type">
+          {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','other'] %}
+          <option value="{{ t }}" {% if project.garment_type == t %}selected{% endif %}>{{ t | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="status">Status</label>
+        <select class="form__input" id="status" name="status">
+          {% for s in ['idea','planned','sourcing','cutting','sewing','finished','paused','abandoned'] %}
+          <option value="{{ s }}" {% if project.status == s %}selected{% endif %}>{{ s | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="season">Season</label>
+        <select class="form__input" id="season" name="season">
+          {% for s in ['spring','summer','autumn','winter','year-round'] %}
+          <option value="{{ s }}" {% if project.season == s %}selected{% endif %}>{{ s | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="priority">Priority</label>
+        <select class="form__input" id="priority" name="priority">
+          {% for p in ['high','medium','low'] %}
+          <option value="{{ p }}" {% if project.priority == p %}selected{% endif %}>{{ p | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="notes">Notes</label>
+      <textarea class="form__textarea" id="notes" name="notes" rows="4">{{ project.notes or '' }}</textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="fit_considerations">Fit considerations</label>
+      <textarea class="form__textarea" id="fit_considerations" name="fit_considerations" rows="3">{{ project.fit_considerations or '' }}</textarea>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Save changes</button>
+      <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

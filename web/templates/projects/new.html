@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}New project · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <h1 class="page-title">New project</h1>
+  <form method="post" action="{{ url_for('projects.create') }}" class="form">
+    <div class="form__field">
+      <label class="form__label" for="title">Title</label>
+      <input class="form__input" type="text" id="title" name="title" required placeholder="e.g. Wool wrap coat" autofocus />
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="garment_type">Garment type</label>
+        <select class="form__input" id="garment_type" name="garment_type">
+          <option value="">Select…</option>
+          {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','other'] %}
+          <option value="{{ t }}">{{ t | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="status">Status</label>
+        <select class="form__input" id="status" name="status">
+          {% for s in ['idea','planned','sourcing','cutting','sewing','paused'] %}
+          <option value="{{ s }}" {% if s == 'idea' %}selected{% endif %}>{{ s | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="season">Season</label>
+        <select class="form__input" id="season" name="season">
+          <option value="">Select…</option>
+          {% for s in ['spring','summer','autumn','winter','year-round'] %}
+          <option value="{{ s }}">{{ s | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="priority">Priority</label>
+        <select class="form__input" id="priority" name="priority">
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="difficulty">Difficulty</label>
+        <select class="form__input" id="difficulty" name="difficulty">
+          <option value="">Select…</option>
+          {% for d in ['beginner','intermediate','advanced','expert'] %}
+          <option value="{{ d }}">{{ d | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="estimated_meterage">Estimated meterage</label>
+        <input class="form__input" type="number" step="0.1" id="estimated_meterage" name="estimated_meterage" placeholder="e.g. 2.8" />
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="occasion">Occasion</label>
+      <input class="form__input" type="text" id="occasion" name="occasion" placeholder="e.g. everyday, work, special occasion" />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="notes">Notes</label>
+      <textarea class="form__textarea" id="notes" name="notes" rows="4" placeholder="Construction ideas, inspiration, fit considerations…"></textarea>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Create project</button>
+      <a href="{{ url_for('projects.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

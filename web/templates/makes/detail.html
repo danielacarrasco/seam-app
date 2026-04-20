@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ make.project.title if make.project else 'Make' }} · Seam{% endblock %}
+{% block content %}
+<div class="detail-page">
+  <div class="detail-page__header">
+    <div>
+      <p class="breadcrumb"><a href="{{ url_for('makes.index') }}">Makes</a></p>
+      <h1 class="page-title">{{ make.project.title if make.project else 'Untitled make' }}</h1>
+      <div class="chip-row">
+        {% if make.fit_outcome %}<span class="chip chip--fit-{{ make.fit_outcome }}">{{ make.fit_outcome | replace('_', ' ') | title }}</span>{% endif %}
+        {% if make.would_remake %}<span class="chip chip--available">Would remake</span>{% endif %}
+        {% if make.wear_frequency %}<span class="chip chip--neutral">{{ make.wear_frequency | title }}</span>{% endif %}
+      </div>
+    </div>
+    <div class="detail-page__actions">
+      <a href="{{ url_for('makes.edit', make_id=make.id) }}" class="btn btn--secondary">Edit</a>
+      <form method="post" action="{{ url_for('makes.delete', make_id=make.id) }}" onsubmit="return confirm('Delete this make?')">
+        <button type="submit" class="btn btn--danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  {% if photos %}
+  <div class="photo-gallery">
+    {% for photo in photos %}
+    <div class="photo-gallery__item">
+      <img src="{{ photo.url }}" alt="Make photo" class="photo-gallery__img" />
+      <form method="post" action="{{ url_for('makes.delete_photo', make_id=make.id, photo_id=photo.id) }}">
+        <button type="submit" class="btn-inline btn-inline--danger">Remove</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="detail-page__body">
+    <div class="detail-page__main">
+      {% if make.what_worked %}
+      <section class="detail-section">
+        <h2 class="section-label">What worked</h2>
+        <div class="prose">{{ make.what_worked }}</div>
+      </section>
+      {% endif %}
+      {% if make.what_didnt %}
+      <section class="detail-section">
+        <h2 class="section-label">What didn't work</h2>
+        <div class="prose">{{ make.what_didnt }}</div>
+      </section>
+      {% endif %}
+      {% if make.lessons_learned %}
+      <section class="detail-section">
+        <h2 class="section-label">Lessons learned</h2>
+        <div class="prose">{{ make.lessons_learned }}</div>
+      </section>
+      {% endif %}
+      {% if make.construction_notes %}
+      <section class="detail-section">
+        <h2 class="section-label">Construction notes</h2>
+        <div class="prose">{{ make.construction_notes }}</div>
+      </section>
+      {% endif %}
+      <section class="detail-section">
+        <h2 class="section-label">Add photos</h2>
+        <form method="post" action="{{ url_for('makes.upload_photo', make_id=make.id) }}" enctype="multipart/form-data" class="inline-form">
+          <input type="file" name="photos" accept="image/*" multiple class="form__input" />
+          <button type="submit" class="btn btn--secondary">Upload</button>
+        </form>
+      </section>
+    </div>
+    <aside class="detail-page__sidebar">
+      <section class="detail-section">
+        <h2 class="section-label">Linked to</h2>
+        <dl class="detail-list">
+          {% if make.project %}<dt>Project</dt><dd><a href="{{ url_for('projects.detail', project_id=make.project.id) }}">{{ make.project.title }}</a></dd>{% endif %}
+          {% if make.pattern %}<dt>Pattern</dt><dd><a href="{{ url_for('patterns.detail', pattern_id=make.pattern.id) }}">{{ make.pattern.pattern_name }}</a></dd>{% endif %}
+          {% if make.fabric %}<dt>Fabric</dt><dd><a href="{{ url_for('stash.detail', fabric_id=make.fabric.id) }}">{{ make.fabric.nickname }}</a></dd>{% endif %}
+          {% if make.care_outcome %}<dt>Care</dt><dd>{{ make.care_outcome }}</dd>{% endif %}
+        </dl>
+      </section>
+    </aside>
+  </div>
+</div>
+{% endblock %}

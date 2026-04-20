@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Patterns · Seam{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Patterns</h1>
+  <a href="{{ url_for('patterns.new') }}" class="btn btn--primary">+ Add pattern</a>
+</div>
+<form class="filter-bar" method="get">
+  <input type="text" name="brand" class="filter-input" placeholder="Brand…" value="{{ filters.get('brand','') }}" />
+  <select name="garment_type" class="filter-select">
+    <option value="">All types</option>
+    {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','other'] %}
+    <option value="{{ t }}" {% if filters.get('garment_type') == t %}selected{% endif %}>{{ t | title }}</option>
+    {% endfor %}
+  </select>
+  <select name="previously_used" class="filter-select">
+    <option value="">All</option>
+    <option value="true" {% if filters.get('previously_used') == 'true' %}selected{% endif %}>Used before</option>
+    <option value="false" {% if filters.get('previously_used') == 'false' %}selected{% endif %}>Not yet used</option>
+  </select>
+  <button type="submit" class="btn btn--secondary">Filter</button>
+  {% if filters %}<a href="{{ url_for('patterns.index') }}" class="btn btn--ghost">Clear</a>{% endif %}
+</form>
+{% if patterns %}
+  <div class="card-grid">
+    {% for pattern in patterns %}
+    <a href="{{ url_for('patterns.detail', pattern_id=pattern.id) }}" class="pattern-card">
+      <div class="pattern-card__img-box">
+        {% if pattern.image_url %}
+          <img src="{{ pattern.image_url }}" alt="{{ pattern.pattern_name }}" class="pattern-card__img" />
+        {% else %}
+          <span class="pattern-card__brand-initial">{{ (pattern.brand or 'P')[0] | upper }}</span>
+        {% endif %}
+      </div>
+      <div class="pattern-card__body">
+        <p class="pattern-card__name">{{ pattern.pattern_name }}</p>
+        <p class="pattern-card__meta">{{ pattern.brand }}{% if pattern.pattern_number %} · {{ pattern.pattern_number }}{% endif %}</p>
+        {% if pattern.garment_type %}<span class="chip chip--neutral chip--sm">{{ pattern.garment_type | title }}</span>{% endif %}
+        {% if pattern.previously_used %}<span class="chip chip--available chip--sm">Used</span>{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% else %}
+  {% set message = "No patterns in your library yet." %}
+  {% set cta_url = url_for('patterns.new') %}
+  {% set cta_label = "+ Add pattern" %}
+  {% include 'partials/empty_state.html' %}
+{% endif %}
+{% endblock %}

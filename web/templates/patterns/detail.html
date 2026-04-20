@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ pattern.pattern_name }} · Seam{% endblock %}
+{% block content %}
+<div class="detail-page">
+  <div class="detail-page__header">
+    <div>
+      <p class="breadcrumb"><a href="{{ url_for('patterns.index') }}">Patterns</a></p>
+      <h1 class="page-title">{{ pattern.pattern_name }}</h1>
+      <p class="page-subtitle">{{ pattern.brand }}{% if pattern.pattern_number %} · {{ pattern.pattern_number }}{% endif %}</p>
+      <div class="chip-row">
+        {% if pattern.garment_type %}<span class="chip chip--neutral">{{ pattern.garment_type | title }}</span>{% endif %}
+        {% if pattern.previously_used %}<span class="chip chip--available">Used before</span>{% endif %}
+      </div>
+    </div>
+    <div class="detail-page__actions">
+      <a href="{{ url_for('patterns.edit', pattern_id=pattern.id) }}" class="btn btn--secondary">Edit</a>
+      <form method="post" action="{{ url_for('patterns.delete', pattern_id=pattern.id) }}" onsubmit="return confirm('Remove this pattern?')">
+        <button type="submit" class="btn btn--danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="detail-page__body">
+    <div class="detail-page__main">
+      <section class="detail-section">
+        <h2 class="section-label">Details</h2>
+        <dl class="detail-list detail-list--grid">
+          {% if pattern.size_chosen %}<dt>Size chosen</dt><dd>{{ pattern.size_chosen }}</dd>{% endif %}
+          {% if pattern.size_range %}<dt>Size range</dt><dd>{{ pattern.size_range }}</dd>{% endif %}
+          {% if pattern.view_version %}<dt>View</dt><dd>{{ pattern.view_version }}</dd>{% endif %}
+          {% if pattern.recommended_fabrics %}<dt>Rec. fabrics</dt><dd>{{ pattern.recommended_fabrics }}</dd>{% endif %}
+          {% if pattern.instructions_rating %}<dt>Instructions</dt><dd>{{ pattern.instructions_rating }}/5</dd>{% endif %}
+        </dl>
+      </section>
+
+      {% if pattern.notes %}
+      <section class="detail-section">
+        <h2 class="section-label">Notes</h2>
+        <div class="prose">{{ pattern.notes }}</div>
+      </section>
+      {% endif %}
+
+      <section class="detail-section">
+        <h2 class="section-label">Fit history</h2>
+        {% if fit_history %}
+          <ol class="fit-history">
+            {% for entry in fit_history %}
+            <li class="fit-history__entry">
+              <p class="fit-history__date">{{ entry.created_at }}</p>
+              {% if entry.size_used %}<p class="fit-history__size">Size {{ entry.size_used }}</p>{% endif %}
+              {% if entry.alterations_made %}<p class="fit-history__alteration">{{ entry.alterations_made }}</p>{% endif %}
+              {% if entry.fit_notes %}<p class="prose">{{ entry.fit_notes }}</p>{% endif %}
+              <form method="post" action="{{ url_for('patterns.delete_fit_history', pattern_id=pattern.id, entry_id=entry.id) }}">
+                <button type="submit" class="btn-inline btn-inline--danger">Remove</button>
+              </form>
+            </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p class="muted">No fit history yet — entries are added automatically when you archive a make.</p>
+        {% endif %}
+        <form method="post" action="{{ url_for('patterns.add_fit_history', pattern_id=pattern.id) }}" class="log-form">
+          <input class="form__input" type="text" name="size_used" placeholder="Size used" />
+          <input class="form__input" type="text" name="alterations_made" placeholder="Alterations made" />
+          <textarea class="form__textarea" name="fit_notes" rows="2" placeholder="Fit notes…"></textarea>
+          <button type="submit" class="btn btn--secondary">Add entry</button>
+        </form>
+      </section>
+    </div>
+
+    <aside class="detail-page__sidebar">
+      {% if pattern.image_url %}
+      <div class="pattern-envelope">
+        <img src="{{ pattern.image_url }}" alt="{{ pattern.pattern_name }}" class="pattern-envelope__img" />
+      </div>
+      {% endif %}
+      <section class="detail-section">
+        <h2 class="section-label">Update image</h2>
+        <form method="post" action="{{ url_for('patterns.upload_image', pattern_id=pattern.id) }}" enctype="multipart/form-data" class="inline-form">
+          <input type="file" name="image" accept="image/*" class="form__input" />
+          <button type="submit" class="btn btn--secondary">Upload</button>
+        </form>
+      </section>
+    </aside>
+  </div>
+</div>
+{% endblock %}

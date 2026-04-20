@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}{{ fabric.nickname }} · Seam{% endblock %}
+{% block content %}
+<div class="detail-page">
+  <div class="detail-page__header">
+    <div>
+      <p class="breadcrumb"><a href="{{ url_for('stash.index') }}">Stash</a></p>
+      <h1 class="page-title">{{ fabric.nickname }}</h1>
+      <div class="chip-row">
+        <span class="chip chip--{{ 'reserved' if fabric.reserved else 'available' }}">{{ 'Reserved' if fabric.reserved else 'Available' }}</span>
+        {% if fabric.fiber_content %}<span class="chip chip--neutral">{{ fabric.fiber_content | title }}</span>{% endif %}
+        {% if fabric.stretch %}<span class="chip chip--neutral">Stretch</span>{% endif %}
+      </div>
+    </div>
+    <div class="detail-page__actions">
+      <a href="{{ url_for('stash.edit', fabric_id=fabric.id) }}" class="btn btn--secondary">Edit</a>
+      <form method="post" action="{{ url_for('stash.delete', fabric_id=fabric.id) }}" onsubmit="return confirm('Remove this fabric from stash?')">
+        <button type="submit" class="btn btn--danger">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  {% if fabric.photo_url %}
+  <div class="fabric-hero">
+    <img src="{{ fabric.photo_url }}" alt="{{ fabric.nickname }}" class="fabric-hero__img" />
+  </div>
+  {% endif %}
+
+  <div class="detail-page__body">
+    <div class="detail-page__main">
+      <section class="detail-section">
+        <h2 class="section-label">Properties</h2>
+        <dl class="detail-list detail-list--grid">
+          {% if fabric.fiber_content %}<dt>Fibre</dt><dd>{{ fabric.fiber_content | title }}</dd>{% endif %}
+          {% if fabric.length_meters %}<dt>Length</dt><dd>{{ fabric.length_meters }}m</dd>{% endif %}
+          {% if fabric.width_cm %}<dt>Width</dt><dd>{{ fabric.width_cm }}cm</dd>{% endif %}
+          {% if fabric.weight_gsm %}<dt>Weight</dt><dd>{{ fabric.weight_gsm }} GSM</dd>{% endif %}
+          {% if fabric.drape_structure %}<dt>Structure</dt><dd>{{ fabric.drape_structure | title }}</dd>{% endif %}
+          {% if fabric.color %}<dt>Colour</dt><dd>{{ fabric.color }}</dd>{% endif %}
+          {% if fabric.opacity %}<dt>Opacity</dt><dd>{{ fabric.opacity | title }}</dd>{% endif %}
+          {% if fabric.care_instructions %}<dt>Care</dt><dd>{{ fabric.care_instructions }}</dd>{% endif %}
+          {% if fabric.source_store %}<dt>Source</dt><dd>{{ fabric.source_store }}</dd>{% endif %}
+          {% if fabric.cost %}<dt>Cost</dt><dd>{{ fabric.cost }}</dd>{% endif %}
+          {% if fabric.date_acquired %}<dt>Acquired</dt><dd>{{ fabric.date_acquired }}</dd>{% endif %}
+        </dl>
+      </section>
+      {% if fabric.notes %}
+      <section class="detail-section">
+        <h2 class="section-label">Notes</h2>
+        <div class="prose">{{ fabric.notes }}</div>
+      </section>
+      {% endif %}
+      <section class="detail-section">
+        <h2 class="section-label">Update photo</h2>
+        <form method="post" action="{{ url_for('stash.upload_photo', fabric_id=fabric.id) }}" enctype="multipart/form-data" class="inline-form">
+          <input type="file" name="photo" accept="image/*" class="form__input" />
+          <button type="submit" class="btn btn--secondary">Upload</button>
+        </form>
+      </section>
+    </div>
+    <aside class="detail-page__sidebar">
+      <section class="detail-section">
+        <h2 class="section-label">Reservation</h2>
+        {% if fabric.reserved and fabric.reserved_project %}
+          <p class="muted">Reserved for <a href="{{ url_for('projects.detail', project_id=fabric.reserved_project.id) }}">{{ fabric.reserved_project.title }}</a>.</p>
+          <form method="post" action="{{ url_for('stash.release', fabric_id=fabric.id) }}">
+            <button type="submit" class="btn btn--secondary btn--sm">Release reservation</button>
+          </form>
+        {% else %}
+          <p class="muted">Not reserved.</p>
+        {% endif %}
+      </section>
+      {% if suitable_projects %}
+      <section class="detail-section">
+        <h2 class="section-label">Suitable for</h2>
+        <ul class="link-list">
+          {% for project in suitable_projects %}
+          <li class="link-list__item">
+            <a href="{{ url_for('projects.detail', project_id=project.id) }}">{{ project.title }}</a>
+            <form method="post" action="{{ url_for('stash.reserve', fabric_id=fabric.id, project_id=project.id) }}">
+              <button type="submit" class="btn-inline">Reserve</button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
