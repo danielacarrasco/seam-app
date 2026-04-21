@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Measurements · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <h1 class="page-title">Measurements</h1>
+  <p class="muted">All measurements in centimetres.</p>
+
+  <form method="post" action="{{ url_for('measurements.save') }}" class="form">
+    <div class="form__grid">
+      {% for field in fields %}
+      <div class="form__field">
+        <label class="form__label" for="{{ field }}">{{ field | replace('_', ' ') | title }}</label>
+        <input class="form__input" type="number" step="0.1" id="{{ field }}" name="{{ field }}" value="{{ profile.get(field) or '' }}" />
+      </div>
+      {% endfor %}
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="preferred_ease">Preferred ease</label>
+      <input class="form__input" type="text" id="preferred_ease" name="preferred_ease" value="{{ profile.get('preferred_ease') or '' }}" placeholder="e.g. 2.5cm at waist" />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="fit_notes">Fit notes</label>
+      <textarea class="form__textarea" id="fit_notes" name="fit_notes" rows="3">{{ profile.get('fit_notes') or '' }}</textarea>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Save measurements</button>
+    </div>
+  </form>
+
+  <section class="detail-section">
+    <h2 class="section-label">Common alterations</h2>
+    {% if alterations %}
+    <ul class="link-list">
+      {% for alt in alterations %}
+      <li class="link-list__item">
+        <div>
+          <p>{{ alt.label }}</p>
+          {% if alt.notes %}<p class="muted">{{ alt.notes }}</p>{% endif %}
+        </div>
+        <form method="post" action="{{ url_for('measurements.delete_alteration', alteration_id=alt.id) }}">
+          <button type="submit" class="btn-inline btn-inline--danger">Remove</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No alterations recorded yet.</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('measurements.add_alteration') }}" class="log-form">
+      <input class="form__input" type="text" name="label" placeholder="e.g. Swayback adjustment" required />
+      <input class="form__input" type="text" name="notes" placeholder="Notes (optional)" />
+      <button type="submit" class="btn btn--secondary">Add alteration</button>
+    </form>
+  </section>
+
+  <section class="detail-section">
+    <h2 class="section-label">Garment-specific fit notes</h2>
+    {% if fit_notes %}
+    <ul class="link-list">
+      {% for note in fit_notes %}
+      <li class="link-list__item">
+        <div>
+          <p class="fit-history__size">{{ note.garment_type | title }}</p>
+          <p>{{ note.note }}</p>
+        </div>
+        <form method="post" action="{{ url_for('measurements.delete_fit_note', note_id=note.id) }}">
+          <button type="submit" class="btn-inline btn-inline--danger">Remove</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No fit notes yet.</p>
+    {% endif %}
+    <form method="post" action="{{ url_for('measurements.add_fit_note') }}" class="log-form">
+      <input class="form__input" type="text" name="garment_type" placeholder="Garment type (e.g. trouser)" required />
+      <textarea class="form__textarea" name="note" rows="2" placeholder="e.g. always need a swayback adjustment" required></textarea>
+      <button type="submit" class="btn btn--secondary">Add fit note</button>
+    </form>
+  </section>
+
+  {% if history %}
+  <section class="detail-section">
+    <h2 class="section-label">History</h2>
+    <ol class="log">
+      {% for snap in history %}
+      <li class="log__entry">
+        <div class="log__dot"></div>
+        <div class="log__content">
+          <p class="log__date">{{ snap.created_at }}</p>
+          <p class="log__note">
+            {% for k, v in snap.data.items() %}{% if v is not none and v != '' %}{{ k | replace('_', ' ') }}: {{ v }}{% if not loop.last %} · {% endif %}{% endif %}{% endfor %}
+          </p>
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
