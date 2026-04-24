@@ -18,6 +18,7 @@
       <a href="{{ url_for('stash.index') }}" class="nav__link {% if request.blueprint == 'stash' %}nav__link--active{% endif %}">Stash</a>
       <a href="{{ url_for('patterns.index') }}" class="nav__link {% if request.blueprint == 'patterns' %}nav__link--active{% endif %}">Patterns</a>
       <a href="{{ url_for('makes.index') }}" class="nav__link {% if request.blueprint == 'makes' %}nav__link--active{% endif %}">Makes</a>
+      <a href="{{ url_for('sketches.index') }}" class="nav__link {% if request.blueprint == 'sketches' %}nav__link--active{% endif %}">Sketches</a>
       <a href="{{ url_for('measurements.index') }}" class="nav__link {% if request.blueprint == 'measurements' %}nav__link--active{% endif %}">Measurements</a>
     </div>
     <a href="{{ url_for('projects.new') }}" class="nav__cta">+ New</a>

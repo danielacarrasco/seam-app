@@ -8,6 +8,7 @@ from api.models.measurement import (
     Alteration,
     FitNote,
 )
+from api.models.sketch import Sketch
 
 __all__ = [
     "Project",
@@ -22,4 +23,5 @@ __all__ = [
     "MeasurementSnapshot",
     "Alteration",
     "FitNote",
+    "Sketch",
 ]

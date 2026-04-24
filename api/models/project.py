@@ -57,6 +57,11 @@ class Project(Base):
         back_populates="reserved_project",
     )
     makes = relationship("Make", back_populates="project")
+    sketches = relationship(
+        "Sketch",
+        back_populates="project",
+        order_by="desc(Sketch.created_at)",
+    )
 
 
 class ProjectFabric(Base):

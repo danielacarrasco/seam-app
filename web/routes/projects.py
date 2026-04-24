@@ -51,7 +51,11 @@ def detail(project_id):
     project = resp.json()
     log_resp = requests.get(f"{API}/projects/{project_id}/log")
     log = log_resp.json() if log_resp.ok else []
-    return render_template("projects/detail.html", project=project, log=log)
+    sketches_resp = requests.get(f"{API}/sketches/", params={"project_id": project_id})
+    sketches = sketches_resp.json() if sketches_resp.ok else []
+    return render_template(
+        "projects/detail.html", project=project, log=log, sketches=sketches
+    )
 
 
 @bp.route("/<int:project_id>/edit")
