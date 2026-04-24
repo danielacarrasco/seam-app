@@ -3,53 +3,26 @@
 {% block content %}
 <div class="form-page">
   <h1 class="page-title">New sketch</h1>
-  <p class="muted">Upload an image you already have, or generate one with AI.</p>
+  <p class="muted">Upload an image and optionally connect it to a project.</p>
 
-  <section class="detail-section">
-    <h2 class="section-label">Upload</h2>
-    <form method="post" action="{{ url_for('sketches.upload') }}" enctype="multipart/form-data" class="form">
-      <div class="form__field">
-        <label class="form__label" for="upload_image">Image file</label>
-        <input class="form__input" type="file" id="upload_image" name="image" accept="image/*" required />
-      </div>
-      <div class="form__field">
-        <label class="form__label" for="upload_project">Connect to project (optional)</label>
-        <select class="form__input" id="upload_project" name="project_id">
-          <option value="">—</option>
-          {% for p in projects %}
-          <option value="{{ p.id }}" {% if prefill_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="form__actions">
-        <button type="submit" class="btn btn--primary">Upload</button>
-      </div>
-    </form>
-  </section>
-
-  <section class="detail-section">
-    <h2 class="section-label">Generate with AI</h2>
-    <form method="post" action="{{ url_for('sketches.generate') }}" class="form">
-      <div class="form__field">
-        <label class="form__label" for="prompt">Prompt</label>
-        <textarea class="form__textarea" id="prompt" name="prompt" rows="4" required
-          placeholder="e.g. An A-line midi dress in navy wool crepe, long sleeves, high neckline, front darts, hemline falling mid-calf."></textarea>
-      </div>
-      <div class="form__field">
-        <label class="form__label" for="gen_project">Connect to project (optional)</label>
-        <select class="form__input" id="gen_project" name="project_id">
-          <option value="">—</option>
-          {% for p in projects %}
-          <option value="{{ p.id }}" {% if prefill_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div class="form__actions">
-        <button type="submit" class="btn btn--primary">Generate sketch</button>
-        <a href="{{ url_for('sketches.index') }}" class="btn btn--ghost">Cancel</a>
-      </div>
-      <p class="muted">Generation uses your OpenAI credit and can take 10–30 seconds.</p>
-    </form>
-  </section>
+  <form method="post" action="{{ url_for('sketches.upload') }}" enctype="multipart/form-data" class="form">
+    <div class="form__field">
+      <label class="form__label" for="upload_image">Image file</label>
+      <input class="form__input" type="file" id="upload_image" name="image" accept="image/*" required />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="upload_project">Connect to project (optional)</label>
+      <select class="form__input" id="upload_project" name="project_id">
+        <option value="">—</option>
+        {% for p in projects %}
+        <option value="{{ p.id }}" {% if prefill_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Upload</button>
+      <a href="{{ url_for('sketches.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

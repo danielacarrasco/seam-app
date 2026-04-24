@@ -37,7 +37,7 @@
     {% endfor %}
   </div>
 {% else %}
-  {% set message = "No sketches yet — upload one or generate your first." %}
+  {% set message = "No sketches yet — upload your first." %}
   {% set cta_url = url_for('sketches.new') %}
   {% set cta_label = "+ New sketch" %}
   {% include 'partials/empty_state.html' %}
