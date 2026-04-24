@@ -36,6 +36,9 @@ flask_session/
 *.db
 *.sqlite3
 
+# Uploaded media
+uploads/
+
 # OS
 .DS_Store
 Thumbs.db

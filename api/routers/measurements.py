@@ -1,146 +1,184 @@
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
+
 from api.database import get_db
+from api.models import Alteration, FitNote, MeasurementProfile, MeasurementSnapshot
+from api.models.measurement import MEASUREMENT_FIELDS
+from api.schemas import (
+    AlterationCreate,
+    AlterationRead,
+    FitNoteCreate,
+    FitNoteRead,
+    FitNoteUpdate,
+    MeasurementProfilePatch,
+    MeasurementProfileRead,
+    MeasurementProfileWrite,
+    MeasurementSnapshotRead,
+)
 
 router = APIRouter()
 
-# Measurements belong to a single user profile.
-# All routes operate on that profile rather than a collection.
-# History entries are stored separately to track changes over time.
+PROFILE_ID = 1
 
 
-@router.get("/")
+def _get_or_create_profile(db: Session) -> MeasurementProfile:
+    profile = db.get(MeasurementProfile, PROFILE_ID)
+    if not profile:
+        profile = MeasurementProfile(id=PROFILE_ID)
+        db.add(profile)
+        db.flush()
+    return profile
+
+
+def _snapshot(profile: MeasurementProfile, db: Session) -> None:
+    data = {
+        field: getattr(profile, field) for field in MEASUREMENT_FIELDS
+    }
+    data["preferred_ease"] = profile.preferred_ease
+    data["fit_notes"] = profile.fit_notes
+    db.add(MeasurementSnapshot(data=data))
+
+
+@router.get("/", response_model=MeasurementProfileRead)
 def get_measurements(db: Session = Depends(get_db)):
-    """
-    Return the current measurement profile.
-    Includes all body measurements, preferred fit notes,
-    and common alterations.
-    """
-    return {}
+    return _get_or_create_profile(db)
 
 
-@router.put("/")
-def save_measurements(db: Session = Depends(get_db)):
-    """
-    Create or fully replace the measurement profile.
-    Accepts all measurement fields. Also saves a timestamped
-    snapshot to measurement history automatically.
-
-    Expected fields (all in cm):
-    bust, waist, hips, high_bust, back_length, front_length,
-    shoulder_width, sleeve_length, inseam, rise, neck,
-    upper_arm, wrist, thigh, calf, height, weight (optional).
-
-    Also accepts: preferred_ease, common_alterations (list of strings),
-    fit_notes (free text).
-    """
-    return {}
+@router.put("/", response_model=MeasurementProfileRead)
+def save_measurements(
+    payload: MeasurementProfileWrite, db: Session = Depends(get_db)
+):
+    profile = _get_or_create_profile(db)
+    data = payload.model_dump()
+    for field, value in data.items():
+        setattr(profile, field, value)
+    _snapshot(profile, db)
+    db.commit()
+    db.refresh(profile)
+    return profile
 
 
-@router.patch("/")
-def update_measurements(db: Session = Depends(get_db)):
-    """
-    Partially update the measurement profile.
-    Only provided fields are updated. Also saves a history snapshot.
-    """
-    return {}
+@router.patch("/", response_model=MeasurementProfileRead)
+def update_measurements(
+    payload: MeasurementProfilePatch, db: Session = Depends(get_db)
+):
+    profile = _get_or_create_profile(db)
+    data = payload.model_dump(exclude_unset=True)
+    if not data:
+        return profile
+    for field, value in data.items():
+        setattr(profile, field, value)
+    _snapshot(profile, db)
+    db.commit()
+    db.refresh(profile)
+    return profile
 
 
 # --- Common alterations ---
 
-@router.get("/alterations")
+@router.get("/alterations", response_model=List[AlterationRead])
 def get_alterations(db: Session = Depends(get_db)):
-    """
-    Return the list of common alterations for this profile.
-    Examples: 'lowered bust apex', 'swayback adjustment',
-    'narrow shoulders', 'lengthen bodice 1.5cm'.
-    """
-    return []
+    return db.query(Alteration).order_by(Alteration.created_at.desc()).all()
 
 
-@router.post("/alterations", status_code=status.HTTP_201_CREATED)
-def add_alteration(db: Session = Depends(get_db)):
-    """
-    Add a common alteration to the profile.
-    Accepts label (short string) and optional notes.
-    """
-    return {}
+@router.post(
+    "/alterations",
+    response_model=AlterationRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_alteration(payload: AlterationCreate, db: Session = Depends(get_db)):
+    alteration = Alteration(**payload.model_dump())
+    db.add(alteration)
+    db.commit()
+    db.refresh(alteration)
+    return alteration
 
 
 @router.delete("/alterations/{alteration_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_alteration(alteration_id: int, db: Session = Depends(get_db)):
-    """Remove a common alteration from the profile."""
+    alteration = db.get(Alteration, alteration_id)
+    if alteration:
+        db.delete(alteration)
+        db.commit()
     return None
 
 
 # --- Garment-specific fit notes ---
 
-@router.get("/fit-notes")
+@router.get("/fit-notes", response_model=List[FitNoteRead])
 def list_fit_notes(
     garment_type: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
-    """
-    Return garment-specific fitting notes.
-    Optionally filter by garment_type (e.g. 'trouser', 'coat', 'dress').
-    """
-    return []
+    q = db.query(FitNote)
+    if garment_type:
+        q = q.filter(FitNote.garment_type == garment_type)
+    return q.order_by(FitNote.created_at.desc()).all()
 
 
-@router.post("/fit-notes", status_code=status.HTTP_201_CREATED)
-def add_fit_note(db: Session = Depends(get_db)):
-    """
-    Add a garment-specific fit note to the profile.
-    Accepts garment_type and note (free text).
-    Example: garment_type='trouser', note='always need a swayback adjustment'.
-    """
-    return {}
+@router.post(
+    "/fit-notes",
+    response_model=FitNoteRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def add_fit_note(payload: FitNoteCreate, db: Session = Depends(get_db)):
+    note = FitNote(**payload.model_dump())
+    db.add(note)
+    db.commit()
+    db.refresh(note)
+    return note
 
 
-@router.patch("/fit-notes/{note_id}")
-def update_fit_note(note_id: int, db: Session = Depends(get_db)):
-    """Update a garment-specific fit note."""
-    note = None  # replace with db lookup
+@router.patch("/fit-notes/{note_id}", response_model=FitNoteRead)
+def update_fit_note(
+    note_id: int, payload: FitNoteUpdate, db: Session = Depends(get_db)
+):
+    note = db.get(FitNote, note_id)
     if not note:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Fit note {note_id} not found",
-        )
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"Fit note {note_id} not found")
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(note, field, value)
+    db.commit()
+    db.refresh(note)
     return note
 
 
 @router.delete("/fit-notes/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_fit_note(note_id: int, db: Session = Depends(get_db)):
-    """Delete a garment-specific fit note."""
+    note = db.get(FitNote, note_id)
+    if note:
+        db.delete(note)
+        db.commit()
     return None
 
 
 # --- Measurement history ---
 
-@router.get("/history")
+@router.get("/history", response_model=List[MeasurementSnapshotRead])
 def get_measurement_history(db: Session = Depends(get_db)):
-    """
-    Return all past measurement snapshots, newest first.
-    Each snapshot is a full copy of measurements at a point in time.
-    Useful for tracking changes over time.
-    """
-    return []
+    return (
+        db.query(MeasurementSnapshot)
+        .order_by(MeasurementSnapshot.created_at.desc())
+        .all()
+    )
 
 
-@router.get("/history/{snapshot_id}")
+@router.get("/history/{snapshot_id}", response_model=MeasurementSnapshotRead)
 def get_snapshot(snapshot_id: int, db: Session = Depends(get_db)):
-    """Return a single historical measurement snapshot."""
-    snapshot = None  # replace with db lookup
+    snapshot = db.get(MeasurementSnapshot, snapshot_id)
     if not snapshot:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Snapshot {snapshot_id} not found",
+            status.HTTP_404_NOT_FOUND, f"Snapshot {snapshot_id} not found"
         )
     return snapshot
 
 
 @router.delete("/history/{snapshot_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_snapshot(snapshot_id: int, db: Session = Depends(get_db)):
-    """Delete a historical measurement snapshot."""
+    snapshot = db.get(MeasurementSnapshot, snapshot_id)
+    if snapshot:
+        db.delete(snapshot)
+        db.commit()
     return None
