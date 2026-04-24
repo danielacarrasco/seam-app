@@ -8,6 +8,7 @@ from fastapi import HTTPException, UploadFile, status
 
 UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", "uploads")).resolve()
 MEDIA_URL_PREFIX = "/media"
+MEDIA_BASE_URL = os.getenv("MEDIA_BASE_URL", "").rstrip("/")
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
 _EXTENSIONS = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}
@@ -49,4 +50,13 @@ def delete_image(relative_path: Optional[str]) -> None:
 def media_url(relative_path: Optional[str]) -> Optional[str]:
     if not relative_path:
         return None
-    return f"{MEDIA_URL_PREFIX}/{relative_path}"
+    return f"{MEDIA_BASE_URL}{MEDIA_URL_PREFIX}/{relative_path}"
+
+
+def save_bytes(data: bytes, subdir: str, extension: str) -> str:
+    target_dir = ensure_upload_dir(subdir)
+    name = f"{secrets.token_hex(8)}{extension}"
+    dest = target_dir / name
+    with dest.open("wb") as out:
+        out.write(data)
+    return f"{subdir}/{name}"

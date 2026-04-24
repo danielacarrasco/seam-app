@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from api import models  # noqa: F401  -- register models with Base.metadata
 from api.database import Base, engine
-from api.routers import fabrics, makes, measurements, patterns, projects
+from api.routers import fabrics, makes, measurements, patterns, projects, sketches
 from api.storage import MEDIA_URL_PREFIX, ensure_upload_dir
 
 Base.metadata.create_all(bind=engine)
@@ -33,6 +33,7 @@ app.include_router(fabrics.router, prefix="/fabrics", tags=["fabrics"])
 app.include_router(patterns.router, prefix="/patterns", tags=["patterns"])
 app.include_router(measurements.router, prefix="/measurements", tags=["measurements"])
 app.include_router(makes.router, prefix="/makes", tags=["makes"])
+app.include_router(sketches.router, prefix="/sketches", tags=["sketches"])
 
 
 @app.get("/health")

@@ -92,6 +92,22 @@
         {% endif %}
       </section>
       <section class="detail-section">
+        <h2 class="section-label">Sketches</h2>
+        {% if sketches %}
+          <div class="recent-row">
+            {% for sketch in sketches %}
+            <a href="{{ url_for('sketches.detail', sketch_id=sketch.id) }}" class="mini-card">
+              <img src="{{ sketch.url }}" alt="Sketch" style="width:100%;height:auto;border-radius:4px;" />
+              <p class="mini-card__meta">{{ sketch.source | title }}</p>
+            </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="muted">No sketches yet.</p>
+        {% endif %}
+        <a href="{{ url_for('sketches.new', project_id=project.id) }}" class="btn btn--secondary btn--sm">+ Add sketch</a>
+      </section>
+      <section class="detail-section">
         <h2 class="section-label">Details</h2>
         <dl class="detail-list">
           {% if project.difficulty %}<dt>Difficulty</dt><dd>{{ project.difficulty | title }}</dd>{% endif %}

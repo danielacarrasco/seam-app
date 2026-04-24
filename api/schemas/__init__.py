@@ -38,6 +38,7 @@ from api.schemas.measurement import (
     FitNoteUpdate,
     FitNoteRead,
 )
+from api.schemas.sketch import SketchGenerate, SketchRead, SketchUpdate
 
 __all__ = [
     "FabricCreate",
@@ -70,4 +71,7 @@ __all__ = [
     "FitNoteCreate",
     "FitNoteUpdate",
     "FitNoteRead",
+    "SketchGenerate",
+    "SketchRead",
+    "SketchUpdate",
 ]

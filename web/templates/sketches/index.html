@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Sketches · Seam{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Sketches</h1>
+  <a href="{{ url_for('sketches.new') }}" class="btn btn--primary">+ New sketch</a>
+</div>
+
+<form class="filter-bar" method="get">
+  <select name="project_id" class="filter-select">
+    <option value="">All projects</option>
+    {% for p in projects %}
+    <option value="{{ p.id }}" {% if filter_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn--secondary">Filter</button>
+  {% if filter_project_id %}<a href="{{ url_for('sketches.index') }}" class="btn btn--ghost">Clear</a>{% endif %}
+</form>
+
+{% if sketches %}
+  <div class="makes-grid">
+    {% for sketch in sketches %}
+    <a href="{{ url_for('sketches.detail', sketch_id=sketch.id) }}" class="make-card">
+      <div class="make-card__img-box">
+        <img src="{{ sketch.url }}" alt="Sketch" class="make-card__img" />
+      </div>
+      <div class="make-card__body">
+        <p class="make-card__name">
+          {% if sketch.project %}{{ sketch.project.title }}{% else %}Unassigned{% endif %}
+        </p>
+        <p class="make-card__meta">{{ sketch.created_at }}</p>
+        <div class="make-card__chips">
+          <span class="chip chip--neutral chip--sm">{{ sketch.source | title }}</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+{% else %}
+  {% set message = "No sketches yet — upload your first." %}
+  {% set cta_url = url_for('sketches.new') %}
+  {% set cta_label = "+ New sketch" %}
+  {% include 'partials/empty_state.html' %}
+{% endif %}
+{% endblock %}

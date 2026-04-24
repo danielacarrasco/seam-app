@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}New sketch · Seam{% endblock %}
+{% block content %}
+<div class="form-page">
+  <h1 class="page-title">New sketch</h1>
+  <p class="muted">Upload an image and optionally connect it to a project.</p>
+
+  <form method="post" action="{{ url_for('sketches.upload') }}" enctype="multipart/form-data" class="form">
+    <div class="form__field">
+      <label class="form__label" for="upload_image">Image file</label>
+      <input class="form__input" type="file" id="upload_image" name="image" accept="image/*" required />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="upload_project">Connect to project (optional)</label>
+      <select class="form__input" id="upload_project" name="project_id">
+        <option value="">—</option>
+        {% for p in projects %}
+        <option value="{{ p.id }}" {% if prefill_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Upload</button>
+      <a href="{{ url_for('sketches.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
