@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: seam-api
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r api/requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    disk:
+      name: seam-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite:////data/seam.db
+      - key: UPLOAD_DIR
+        value: /data/uploads
+      - key: CORS_ALLOW_ORIGINS
+        sync: false
+
+  - type: web
+    name: seam-web
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r web/requirements.txt
+    startCommand: gunicorn web.app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: API_BASE_URL
+        sync: false
+      - key: FLASK_SECRET_KEY
+        generateValue: true
