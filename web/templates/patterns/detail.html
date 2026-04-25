@@ -75,6 +75,33 @@
       </div>
       {% endif %}
       <section class="detail-section">
+        <h2 class="section-label">Used in projects</h2>
+        {% if used_in %}
+          <ul class="link-list">
+            {% for p in used_in %}
+            <li class="link-list__item">
+              <a href="{{ url_for('projects.detail', project_id=p.id) }}">{{ p.title }}</a>
+              {% if p.status %}<span class="chip chip--neutral chip--sm">{{ p.status | title }}</span>{% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">Not linked to any project yet.</p>
+        {% endif %}
+        {% if available_projects %}
+        <form method="post" action="{{ url_for('patterns.use_in_project', pattern_id=pattern.id) }}" class="log-form">
+          <select class="form__input" name="project_id" required>
+            <option value="">— Pick a project —</option>
+            {% for p in available_projects %}
+            <option value="{{ p.id }}">{{ p.title }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn--secondary btn--sm">Use in project</button>
+        </form>
+        <p class="muted">Replaces any pattern already on the chosen project.</p>
+        {% endif %}
+      </section>
+      <section class="detail-section">
         <h2 class="section-label">Update image</h2>
         <form method="post" action="{{ url_for('patterns.upload_image', pattern_id=pattern.id) }}" enctype="multipart/form-data" class="inline-form">
           <input type="file" name="image" accept="image/*" class="form__input" />
