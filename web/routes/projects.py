@@ -33,6 +33,7 @@ def create():
         "notes": request.form.get("notes"),
         "category_tags": request.form.getlist("category_tags"),
     }
+    data = {k: (None if v == "" else v) for k, v in data.items()}
     resp = requests.post(f"{API}/projects/", json=data)
     if resp.ok:
         project = resp.json()

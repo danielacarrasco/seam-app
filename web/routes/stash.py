@@ -39,6 +39,7 @@ def create():
         "suitable_garment_types": request.form.getlist("suitable_garment_types"),
         "notes": request.form.get("notes"),
     }
+    data = {k: (None if v == "" else v) for k, v in data.items()}
     resp = requests.post(f"{API}/fabrics/", json=data)
     if resp.ok:
         fabric = resp.json()
