@@ -74,7 +74,20 @@
         {% else %}
           <p class="muted">No fabrics linked.</p>
         {% endif %}
-        <a href="{{ url_for('stash.index') }}" class="btn btn--secondary btn--sm">Browse stash →</a>
+        {% if available_fabrics %}
+        <form method="post" action="{{ url_for('projects.link_fabric_picker', project_id=project.id) }}" class="log-form">
+          <select class="form__input" name="fabric_id" required>
+            <option value="">— Pick a fabric from stash —</option>
+            {% for f in available_fabrics %}
+            <option value="{{ f.id }}">{{ f.nickname }}{% if f.fiber_content %} · {{ f.fiber_content }}{% endif %}{% if f.length_meters %} · {{ f.length_meters }}m{% endif %}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn--secondary btn--sm">Link fabric</button>
+        </form>
+        {% else %}
+        <p class="muted">No more fabrics in stash to link.</p>
+        {% endif %}
+        <a href="{{ url_for('stash.index') }}" class="btn btn--ghost btn--sm">Browse stash →</a>
       </section>
       <section class="detail-section">
         <h2 class="section-label">Pattern</h2>
@@ -88,8 +101,19 @@
           </div>
         {% else %}
           <p class="muted">No pattern linked.</p>
-          <a href="{{ url_for('patterns.index') }}" class="btn btn--secondary btn--sm">Browse patterns →</a>
         {% endif %}
+        {% if available_patterns %}
+        <form method="post" action="{{ url_for('projects.set_pattern_picker', project_id=project.id) }}" class="log-form">
+          <select class="form__input" name="pattern_id" required>
+            <option value="">— Pick a pattern —</option>
+            {% for p in available_patterns %}
+            <option value="{{ p.id }}" {% if project.pattern and project.pattern.id == p.id %}selected{% endif %}>{{ p.pattern_name }}{% if p.brand %} · {{ p.brand }}{% endif %}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn--secondary btn--sm">{{ 'Replace pattern' if project.pattern else 'Link pattern' }}</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('patterns.index') }}" class="btn btn--ghost btn--sm">Browse patterns →</a>
       </section>
       <section class="detail-section">
         <h2 class="section-label">Sketches</h2>
