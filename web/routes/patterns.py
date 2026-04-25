@@ -34,6 +34,7 @@ def create():
         "instructions_rating": request.form.get("instructions_rating"),
         "notes": request.form.get("notes"),
     }
+    data = {k: (None if v == "" else v) for k, v in data.items()}
     resp = requests.post(f"{API}/patterns/", json=data)
     if resp.ok:
         pattern = resp.json()

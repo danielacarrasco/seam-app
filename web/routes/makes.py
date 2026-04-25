@@ -40,6 +40,7 @@ def create():
         "care_outcome": request.form.get("care_outcome"),
         "lessons_learned": request.form.get("lessons_learned"),
     }
+    data = {k: (None if v == "" else v) for k, v in data.items()}
     resp = requests.post(f"{API}/makes/", json=data)
     if resp.ok:
         make = resp.json()
