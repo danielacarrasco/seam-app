@@ -64,8 +64,20 @@ def detail(fabric_id):
     fabric = resp.json()
     suitable = requests.get(f"{API}/fabrics/{fabric_id}/suitable-projects")
     suitable_projects = suitable.json() if suitable.ok else []
+    used_resp = requests.get(f"{API}/projects/", params={"fabric_id": fabric_id})
+    used_in = used_resp.json() if used_resp.ok else []
+    used_ids = {p["id"] for p in used_in}
+    all_resp = requests.get(f"{API}/projects/")
+    available_projects = [
+        p for p in (all_resp.json() if all_resp.ok else [])
+        if p["id"] not in used_ids
+    ]
     return render_template(
-        "stash/detail.html", fabric=fabric, suitable_projects=suitable_projects
+        "stash/detail.html",
+        fabric=fabric,
+        suitable_projects=suitable_projects,
+        used_in=used_in,
+        available_projects=available_projects,
     )
 
 
@@ -109,6 +121,24 @@ def upload_photo(fabric_id):
         files={"file": (photo.filename, photo.stream, photo.content_type)},
     )
     flash("Photo updated.", "success")
+    return redirect(url_for("stash.detail", fabric_id=fabric_id))
+
+
+@bp.route("/<int:fabric_id>/use-in", methods=["POST"])
+def use_in_project(fabric_id):
+    project_id = request.form.get("project_id")
+    if not project_id:
+        flash("Pick a project first.", "error")
+    else:
+        requests.post(f"{API}/projects/{project_id}/fabrics/{fabric_id}")
+        flash("Fabric linked to project.", "success")
+    return redirect(url_for("stash.detail", fabric_id=fabric_id))
+
+
+@bp.route("/<int:fabric_id>/unlink/<int:project_id>", methods=["POST"])
+def unlink_from_project(fabric_id, project_id):
+    requests.delete(f"{API}/projects/{project_id}/fabrics/{fabric_id}")
+    flash("Unlinked from project.", "success")
     return redirect(url_for("stash.detail", fabric_id=fabric_id))
 
 

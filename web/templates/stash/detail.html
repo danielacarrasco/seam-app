@@ -60,6 +60,34 @@
     </div>
     <aside class="detail-page__sidebar">
       <section class="detail-section">
+        <h2 class="section-label">Used in projects</h2>
+        {% if used_in %}
+          <ul class="link-list">
+            {% for p in used_in %}
+            <li class="link-list__item">
+              <a href="{{ url_for('projects.detail', project_id=p.id) }}">{{ p.title }}</a>
+              <form method="post" action="{{ url_for('stash.unlink_from_project', fabric_id=fabric.id, project_id=p.id) }}">
+                <button type="submit" class="btn-inline btn-inline--danger">Unlink</button>
+              </form>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">Not linked to any project yet.</p>
+        {% endif %}
+        {% if available_projects %}
+        <form method="post" action="{{ url_for('stash.use_in_project', fabric_id=fabric.id) }}" class="log-form">
+          <select class="form__input" name="project_id" required>
+            <option value="">— Pick a project —</option>
+            {% for p in available_projects %}
+            <option value="{{ p.id }}">{{ p.title }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn--secondary btn--sm">Use in project</button>
+        </form>
+        {% endif %}
+      </section>
+      <section class="detail-section">
         <h2 class="section-label">Reservation</h2>
         {% if fabric.reserved and fabric.reserved_project %}
           <p class="muted">Reserved for <a href="{{ url_for('projects.detail', project_id=fabric.reserved_project.id) }}">{{ fabric.reserved_project.title }}</a>.</p>
