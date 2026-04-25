@@ -121,7 +121,7 @@
           <div class="recent-row">
             {% for sketch in sketches %}
             <a href="{{ url_for('sketches.detail', sketch_id=sketch.id) }}" class="mini-card">
-              <img src="{{ sketch.url }}" alt="Sketch" style="width:100%;height:auto;border-radius:4px;" />
+              <img src="{{ sketch.url }}" alt="Sketch" class="sketch-thumb" />
               <p class="mini-card__meta">{{ sketch.source | title }}</p>
             </a>
             {% endfor %}

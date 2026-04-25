@@ -21,8 +21,8 @@
   <div class="makes-grid">
     {% for sketch in sketches %}
     <a href="{{ url_for('sketches.detail', sketch_id=sketch.id) }}" class="make-card">
-      <div class="make-card__img-box">
-        <img src="{{ sketch.url }}" alt="Sketch" class="make-card__img" />
+      <div class="sketch-card__img-box">
+        <img src="{{ sketch.url }}" alt="Sketch" class="sketch-card__img" />
       </div>
       <div class="make-card__body">
         <p class="make-card__name">
