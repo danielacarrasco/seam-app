@@ -37,6 +37,13 @@
   <div class="card-grid">
     {% for project in projects %}
     <a href="{{ url_for('projects.detail', project_id=project.id) }}" class="project-card project-card--grid">
+      <div class="project-card__thumb">
+        {% if project.thumbnail_url %}
+          <img src="{{ project.thumbnail_url }}" alt="{{ project.title }}" class="project-card__thumb-img" />
+        {% else %}
+          <span class="project-card__thumb-placeholder">{{ project.title[0] | upper }}</span>
+        {% endif %}
+      </div>
       <div class="project-card__header">
         {% set status = project.status %}
         {% include 'partials/status_chip.html' with context %}

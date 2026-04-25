@@ -58,7 +58,18 @@ def list_projects(
         q = q.filter(Project.pattern_id == pattern_id)
     if fabric_id is not None:
         q = q.join(Project.fabric_links).filter(ProjectFabric.fabric_id == fabric_id)
-    return q.order_by(Project.created_at.desc()).all()
+    projects = q.order_by(Project.created_at.desc()).all()
+    for p in projects:
+        thumb_path = None
+        if p.sketches:
+            thumb_path = p.sketches[0].path
+        elif p.fabric_links:
+            for link in p.fabric_links:
+                if link.fabric.photo_path:
+                    thumb_path = link.fabric.photo_path
+                    break
+        p.thumbnail_url = media_url(thumb_path)
+    return projects
 
 
 @router.post("/", response_model=ProjectRead, status_code=status.HTTP_201_CREATED)

@@ -2,9 +2,8 @@
 {% block title %}Home · Seam{% endblock %}
 {% block content %}
 <section class="dashboard">
-  <header class="dashboard__header">
-    <h1 class="dashboard__greeting">Good {{ time_of_day }}.</h1>
-    <a href="{{ url_for('projects.new') }}" class="btn btn--primary">+ Quick add</a>
+  <header class="dashboard__header dashboard__header--centered">
+    <h1 class="dashboard__greeting">My atelier</h1>
   </header>
 
   {% if active_projects %}
