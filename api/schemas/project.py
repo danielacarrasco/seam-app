@@ -47,6 +47,7 @@ class ProjectSummary(BaseModel):
     season: Optional[str] = None
     priority: Optional[str] = None
     created_at: datetime
+    thumbnail_url: Optional[str] = None
 
 
 class ProjectRead(BaseModel):
