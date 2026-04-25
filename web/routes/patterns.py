@@ -59,9 +59,32 @@ def detail(pattern_id):
     pattern = resp.json()
     history_resp = requests.get(f"{API}/patterns/{pattern_id}/fit-history")
     fit_history = history_resp.json() if history_resp.ok else []
+    used_resp = requests.get(f"{API}/projects/", params={"pattern_id": pattern_id})
+    used_in = used_resp.json() if used_resp.ok else []
+    used_ids = {p["id"] for p in used_in}
+    all_resp = requests.get(f"{API}/projects/")
+    available_projects = [
+        p for p in (all_resp.json() if all_resp.ok else [])
+        if p["id"] not in used_ids
+    ]
     return render_template(
-        "patterns/detail.html", pattern=pattern, fit_history=fit_history
+        "patterns/detail.html",
+        pattern=pattern,
+        fit_history=fit_history,
+        used_in=used_in,
+        available_projects=available_projects,
     )
+
+
+@bp.route("/<int:pattern_id>/use-in", methods=["POST"])
+def use_in_project(pattern_id):
+    project_id = request.form.get("project_id")
+    if not project_id:
+        flash("Pick a project first.", "error")
+    else:
+        requests.put(f"{API}/projects/{project_id}/pattern/{pattern_id}")
+        flash("Pattern linked to project.", "success")
+    return redirect(url_for("patterns.detail", pattern_id=pattern_id))
 
 
 @bp.route("/<int:pattern_id>/edit")

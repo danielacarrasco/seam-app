@@ -54,8 +54,21 @@ def detail(project_id):
     log = log_resp.json() if log_resp.ok else []
     sketches_resp = requests.get(f"{API}/sketches/", params={"project_id": project_id})
     sketches = sketches_resp.json() if sketches_resp.ok else []
+    linked_fabric_ids = {f["id"] for f in project.get("fabrics") or []}
+    fabrics_resp = requests.get(f"{API}/fabrics/")
+    available_fabrics = [
+        f for f in (fabrics_resp.json() if fabrics_resp.ok else [])
+        if f["id"] not in linked_fabric_ids
+    ]
+    patterns_resp = requests.get(f"{API}/patterns/")
+    available_patterns = patterns_resp.json() if patterns_resp.ok else []
     return render_template(
-        "projects/detail.html", project=project, log=log, sketches=sketches
+        "projects/detail.html",
+        project=project,
+        log=log,
+        sketches=sketches,
+        available_fabrics=available_fabrics,
+        available_patterns=available_patterns,
     )
 
 
@@ -105,6 +118,17 @@ def link_fabric(project_id, fabric_id):
     return redirect(url_for("projects.detail", project_id=project_id))
 
 
+@bp.route("/<int:project_id>/fabrics/link", methods=["POST"])
+def link_fabric_picker(project_id):
+    fabric_id = request.form.get("fabric_id")
+    if not fabric_id:
+        flash("Pick a fabric first.", "error")
+    else:
+        requests.post(f"{API}/projects/{project_id}/fabrics/{fabric_id}")
+        flash("Fabric linked.", "success")
+    return redirect(url_for("projects.detail", project_id=project_id))
+
+
 @bp.route("/<int:project_id>/fabrics/<int:fabric_id>/unlink", methods=["POST"])
 def unlink_fabric(project_id, fabric_id):
     requests.delete(f"{API}/projects/{project_id}/fabrics/{fabric_id}")
@@ -114,6 +138,17 @@ def unlink_fabric(project_id, fabric_id):
 @bp.route("/<int:project_id>/pattern/<int:pattern_id>/set", methods=["POST"])
 def set_pattern(project_id, pattern_id):
     requests.put(f"{API}/projects/{project_id}/pattern/{pattern_id}")
+    return redirect(url_for("projects.detail", project_id=project_id))
+
+
+@bp.route("/<int:project_id>/pattern/set", methods=["POST"])
+def set_pattern_picker(project_id):
+    pattern_id = request.form.get("pattern_id")
+    if not pattern_id:
+        flash("Pick a pattern first.", "error")
+    else:
+        requests.put(f"{API}/projects/{project_id}/pattern/{pattern_id}")
+        flash("Pattern linked.", "success")
     return redirect(url_for("projects.detail", project_id=project_id))
 
 
