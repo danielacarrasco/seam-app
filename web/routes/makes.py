@@ -39,6 +39,7 @@ def create():
         "wear_frequency": request.form.get("wear_frequency"),
         "care_outcome": request.form.get("care_outcome"),
         "lessons_learned": request.form.get("lessons_learned"),
+        "rating": request.form.get("rating"),
     }
     data = {k: (None if v == "" else v) for k, v in data.items()}
     resp = requests.post(f"{API}/makes/", json=data)

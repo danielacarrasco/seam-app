@@ -3,6 +3,7 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
     String,
@@ -35,6 +36,7 @@ class Make(Base):
     wear_frequency = Column(String(20))
     care_outcome = Column(Text)
     lessons_learned = Column(Text)
+    rating = Column(Float)
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(

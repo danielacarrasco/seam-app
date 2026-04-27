@@ -62,9 +62,45 @@ def generate():
     if not prompt:
         flash("Write a prompt to generate a sketch.", "error")
         return redirect(url_for("sketches.new"))
+    return _post_generate(prompt, request.form.get("project_id"))
+
+
+@bp.route("/ai-generate", methods=["POST"])
+def ai_generate():
+    parts = []
+    garment = (request.form.get("garment_type") or "").strip()
+    silhouette = (request.form.get("silhouette") or "").strip()
+    color = (request.form.get("color") or "").strip()
+    fabric = (request.form.get("fabric") or "").strip()
+    length = (request.form.get("length") or "").strip()
+    sleeves = (request.form.get("sleeves") or "").strip()
+    extras = (request.form.get("extras") or "").strip()
+
+    descriptor_parts = [p for p in [silhouette, color, fabric] if p]
+    descriptor = " ".join(descriptor_parts)
+    if garment:
+        parts.append(f"{descriptor + ' ' if descriptor else ''}{garment}".strip())
+    elif descriptor:
+        parts.append(descriptor)
+
+    if length:
+        parts.append(f"{length} length")
+    if sleeves:
+        parts.append(f"{sleeves} sleeves")
+    if extras:
+        parts.append(extras)
+
+    if not parts:
+        flash("Pick at least one option or add notes.", "error")
+        return redirect(url_for("sketches.new"))
+    prompt = ". ".join(parts) + "."
+    return _post_generate(prompt, request.form.get("project_id"))
+
+
+def _post_generate(prompt, project_id):
     payload = {"prompt": prompt}
-    if request.form.get("project_id"):
-        payload["project_id"] = int(request.form.get("project_id"))
+    if project_id:
+        payload["project_id"] = int(project_id)
     resp = requests.post(f"{API}/sketches/generate", json=payload, timeout=120)
     if not resp.ok:
         try:
