@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class _ProjectRef(BaseModel):
@@ -33,6 +33,7 @@ class MakeBase(BaseModel):
     wear_frequency: Optional[str] = None
     care_outcome: Optional[str] = None
     lessons_learned: Optional[str] = None
+    rating: Optional[float] = Field(default=None, ge=1, le=7)
 
 
 class MakeCreate(MakeBase):
@@ -55,6 +56,7 @@ class MakeSummary(BaseModel):
     id: int
     fit_outcome: Optional[str] = None
     would_remake: bool
+    rating: Optional[float] = None
     created_at: datetime
     project: Optional[_ProjectRef] = None
     cover_photo_url: Optional[str] = None
@@ -72,6 +74,7 @@ class MakeRead(BaseModel):
     wear_frequency: Optional[str] = None
     care_outcome: Optional[str] = None
     lessons_learned: Optional[str] = None
+    rating: Optional[float] = None
     project: Optional[_ProjectRef] = None
     pattern: Optional[_PatternRef] = None
     fabric: Optional[_FabricRef] = None

@@ -3,26 +3,126 @@
 {% block content %}
 <div class="form-page">
   <h1 class="page-title">New sketch</h1>
-  <p class="muted">Upload an image and optionally connect it to a project.</p>
 
-  <form method="post" action="{{ url_for('sketches.upload') }}" enctype="multipart/form-data" class="form">
-    <div class="form__field">
-      <label class="form__label" for="upload_image">Image file</label>
-      <input class="form__input" type="file" id="upload_image" name="image" accept="image/*" required />
-    </div>
-    <div class="form__field">
-      <label class="form__label" for="upload_project">Connect to project (optional)</label>
-      <select class="form__input" id="upload_project" name="project_id">
-        <option value="">—</option>
-        {% for p in projects %}
-        <option value="{{ p.id }}" {% if prefill_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="form__actions">
-      <button type="submit" class="btn btn--primary">Upload</button>
-      <a href="{{ url_for('sketches.index') }}" class="btn btn--ghost">Cancel</a>
-    </div>
-  </form>
+  <div class="tab-bar">
+    <button type="button" class="tab tab--active" data-target="upload">Upload</button>
+    <button type="button" class="tab" data-target="ai">AI sketch</button>
+  </div>
+
+  <section class="tab-panel" data-tab="upload">
+    <p class="muted">Upload an image and optionally connect it to a project.</p>
+    <form method="post" action="{{ url_for('sketches.upload') }}" enctype="multipart/form-data" class="form">
+      <div class="form__field">
+        <label class="form__label" for="upload_image">Image file</label>
+        <input class="form__input" type="file" id="upload_image" name="image" accept="image/*" required />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="upload_project">Connect to project (optional)</label>
+        <select class="form__input" id="upload_project" name="project_id">
+          <option value="">—</option>
+          {% for p in projects %}
+          <option value="{{ p.id }}" {% if prefill_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__actions">
+        <button type="submit" class="btn btn--primary">Upload</button>
+        <a href="{{ url_for('sketches.index') }}" class="btn btn--ghost">Cancel</a>
+      </div>
+    </form>
+  </section>
+
+  <section class="tab-panel tab-panel--hidden" data-tab="ai">
+    <p class="muted">Pick options for the garment you want sketched. Anything you leave blank is just left out of the prompt.</p>
+    <form method="post" action="{{ url_for('sketches.ai_generate') }}" class="form">
+      <div class="form__row">
+        <div class="form__field">
+          <label class="form__label" for="ai_garment">Garment type</label>
+          <select class="form__input" id="ai_garment" name="garment_type">
+            <option value="">—</option>
+            {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','jumpsuit'] %}
+            <option value="{{ t }}">{{ t | title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form__field">
+          <label class="form__label" for="ai_silhouette">Silhouette</label>
+          <select class="form__input" id="ai_silhouette" name="silhouette">
+            <option value="">—</option>
+            {% for s in ['A-line','fitted','oversized','straight','wrap','draped','cropped','tailored','flared'] %}
+            <option value="{{ s }}">{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form__row">
+        <div class="form__field">
+          <label class="form__label" for="ai_color">Color</label>
+          <input class="form__input" type="text" id="ai_color" name="color" placeholder="e.g. navy, ivory, rust" />
+        </div>
+        <div class="form__field">
+          <label class="form__label" for="ai_fabric">Fabric</label>
+          <select class="form__input" id="ai_fabric" name="fabric">
+            <option value="">—</option>
+            {% for f in ['cotton','linen','silk','wool','wool crepe','denim','leather','knit','jersey','velvet','tweed'] %}
+            <option value="{{ f }}">{{ f | title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form__row">
+        <div class="form__field">
+          <label class="form__label" for="ai_length">Length</label>
+          <select class="form__input" id="ai_length" name="length">
+            <option value="">—</option>
+            {% for l in ['mini','knee','midi','maxi','floor','cropped'] %}
+            <option value="{{ l }}">{{ l | title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form__field">
+          <label class="form__label" for="ai_sleeves">Sleeves</label>
+          <select class="form__input" id="ai_sleeves" name="sleeves">
+            <option value="">—</option>
+            {% for s in ['sleeveless','cap','short','three-quarter','long','bishop','puff'] %}
+            <option value="{{ s }}">{{ s | title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="ai_extras">Extra notes (optional)</label>
+        <textarea class="form__textarea" id="ai_extras" name="extras" rows="3" placeholder="e.g. front darts, asymmetric hem, V neckline, patch pockets…"></textarea>
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="ai_project">Connect to project (optional)</label>
+        <select class="form__input" id="ai_project" name="project_id">
+          <option value="">—</option>
+          {% for p in projects %}
+          <option value="{{ p.id }}" {% if prefill_project_id == p.id %}selected{% endif %}>{{ p.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form__actions">
+        <button type="submit" class="btn btn--primary">Generate sketch</button>
+        <a href="{{ url_for('sketches.index') }}" class="btn btn--ghost">Cancel</a>
+      </div>
+      <p class="muted">Generation uses your OpenAI credit and can take 10–30 seconds.</p>
+    </form>
+  </section>
 </div>
+
+<script>
+  document.querySelectorAll('.tab-bar .tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = btn.dataset.target;
+      document.querySelectorAll('.tab-bar .tab').forEach(function (b) {
+        b.classList.toggle('tab--active', b === btn);
+      });
+      document.querySelectorAll('.tab-panel').forEach(function (p) {
+        p.classList.toggle('tab-panel--hidden', p.dataset.tab !== target);
+      });
+    });
+  });
+</script>
 {% endblock %}

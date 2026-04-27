@@ -7,6 +7,7 @@
       <p class="breadcrumb"><a href="{{ url_for('makes.index') }}">Makes</a></p>
       <h1 class="page-title">{{ make.project.title if make.project else 'Untitled make' }}</h1>
       <div class="chip-row">
+        {% if make.rating is not none %}<span class="chip chip--rating">{{ make.rating }} / 7</span>{% endif %}
         {% if make.fit_outcome %}<span class="chip chip--fit-{{ make.fit_outcome }}">{{ make.fit_outcome | replace('_', ' ') | title }}</span>{% endif %}
         {% if make.would_remake %}<span class="chip chip--available">Would remake</span>{% endif %}
         {% if make.wear_frequency %}<span class="chip chip--neutral">{{ make.wear_frequency | title }}</span>{% endif %}

@@ -61,6 +61,7 @@
         <p class="make-card__name">{{ make.project.title if make.project else 'Untitled make' }}</p>
         <p class="make-card__meta">{{ make.created_at }}</p>
         <div class="make-card__chips">
+          {% if make.rating is not none %}<span class="chip chip--rating chip--sm">{{ make.rating }}/7</span>{% endif %}
           {% if make.fit_outcome %}<span class="chip chip--fit-{{ make.fit_outcome }}">{{ make.fit_outcome | replace('_', ' ') | title }}</span>{% endif %}
           {% if make.would_remake %}<span class="chip chip--available chip--sm">Would remake</span>{% endif %}
         </div>

@@ -92,6 +92,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .chip--priority { background: var(--color-warn-bg); color: #806A20; }
 .chip--reserved { background: var(--color-primary-bg); color: var(--color-primary); }
 .chip--available { background: var(--color-success-bg); color: #2E6B30; }
+.chip--rating { background: rgba(61,58,54,0.05); color: var(--color-text); font-family: var(--font-display); letter-spacing: 0; }
 .chip--fit-good { background: var(--color-success-bg); color: #2E6B30; }
 .chip--fit-needs_adjustment { background: var(--color-warn-bg); color: #806A20; }
 .chip--fit-poor { background: var(--color-danger-bg); color: var(--color-danger); }
@@ -222,6 +223,13 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .sketch-hero { margin-bottom: 24px; border-radius: var(--radius-lg); background: var(--color-surface); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .sketch-hero__img { max-width: 100%; max-height: 600px; object-fit: contain; display: block; }
 .sketch-thumb { display: block; width: 100%; height: auto; border-radius: var(--radius-md); }
+
+/* --- Tabs --- */
+.tab-bar { display: flex; gap: 4px; border-bottom: 1px solid var(--color-border); margin-bottom: 24px; }
+.tab { background: none; border: 0; padding: 10px 18px; font-size: 14px; color: var(--color-text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; }
+.tab:hover { color: var(--color-text); }
+.tab--active { color: var(--color-text); border-bottom-color: var(--color-primary); font-weight: 500; }
+.tab-panel--hidden { display: none; }
 
 /* --- Pattern ref --- */
 .pattern-ref { padding: 12px; background: var(--color-surface); border-radius: var(--radius-md); margin-bottom: 8px; }
