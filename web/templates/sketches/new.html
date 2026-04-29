@@ -1,6 +1,19 @@
 {% extends "base.html" %}
 {% block title %}New sketch · Seam{% endblock %}
 {% block content %}
+{% macro pick(name, label, options, placeholder='Describe…') %}
+<div class="form__field">
+  <label class="form__label" for="ai_{{ name }}">{{ label }}</label>
+  <select class="form__input" id="ai_{{ name }}" name="{{ name }}" data-other>
+    <option value="">—</option>
+    {% for opt in options %}
+    <option value="{{ opt }}">{{ opt[:1] | upper }}{{ opt[1:] }}</option>
+    {% endfor %}
+    <option value="other">Other…</option>
+  </select>
+  <input type="text" class="form__input form__input--other" name="{{ name }}_other" placeholder="{{ placeholder }}" hidden />
+</div>
+{% endmacro %}
 <div class="form-page">
   <h1 class="page-title">New sketch</h1>
 
@@ -36,63 +49,31 @@
     <p class="muted">Pick options for the garment you want sketched. Anything you leave blank is just left out of the prompt.</p>
     <form method="post" action="{{ url_for('sketches.ai_generate') }}" class="form">
       <div class="form__row">
-        <div class="form__field">
-          <label class="form__label" for="ai_garment">Garment type</label>
-          <select class="form__input" id="ai_garment" name="garment_type">
-            <option value="">—</option>
-            {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','jumpsuit'] %}
-            <option value="{{ t }}">{{ t | title }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="form__field">
-          <label class="form__label" for="ai_silhouette">Silhouette</label>
-          <select class="form__input" id="ai_silhouette" name="silhouette">
-            <option value="">—</option>
-            {% for s in ['A-line','fitted','oversized','straight','wrap','draped','cropped','tailored','flared'] %}
-            <option value="{{ s }}">{{ s }}</option>
-            {% endfor %}
-          </select>
-        </div>
+        {{ pick('garment_type', 'Garment type', ['coat','jacket','dress','skirt','trousers','top','blouse','shirt','knitwear','jumpsuit','bag'], 'e.g. cape, kaftan…') }}
+        {{ pick('silhouette', 'Silhouette', ['fitted','relaxed','structured','bias-cut','A-line','oversized','straight','wrap','draped','cropped','tailored','flared'], 'e.g. tent, hourglass…') }}
       </div>
       <div class="form__row">
+        {{ pick('length', 'Length', ['cropped','hip','knee','midi','maxi','floor'], 'e.g. mid-thigh') }}
+        {{ pick('neckline', 'Neckline', ['round','V-neck','scoop','square','sweetheart','halter','off-shoulder','boat','cowl','high','turtleneck','mock-neck','keyhole'], 'e.g. asymmetric one-shoulder') }}
+      </div>
+      <div class="form__row">
+        {{ pick('sleeves', 'Armholes / sleeves', ['sleeveless','cap','short','three-quarter','long','bishop','puff','dropped shoulder','raglan','dolman','kimono','cut-in armhole'], 'describe armholes/sleeves') }}
+        {{ pick('waist_shaping', 'Waist shaping', ['darts','princess seams','loose','drawstring','elastic','belted','drop-waist','empire','seamed','no shaping'], 'e.g. shirring at side seams') }}
+      </div>
+      <div class="form__row">
+        {{ pick('back_design', 'Back design', ['center-back zip','exposed zip','button placket','open back','keyhole','tie back','low scoop','plain seam','shirring','draped'], 'e.g. crossed straps') }}
         <div class="form__field">
           <label class="form__label" for="ai_color">Color</label>
           <input class="form__input" type="text" id="ai_color" name="color" placeholder="e.g. navy, ivory, rust" />
         </div>
-        <div class="form__field">
-          <label class="form__label" for="ai_fabric">Fabric</label>
-          <select class="form__input" id="ai_fabric" name="fabric">
-            <option value="">—</option>
-            {% for f in ['cotton','linen','silk','wool','wool crepe','denim','leather','knit','jersey','velvet','tweed'] %}
-            <option value="{{ f }}">{{ f | title }}</option>
-            {% endfor %}
-          </select>
-        </div>
       </div>
-      <div class="form__row">
-        <div class="form__field">
-          <label class="form__label" for="ai_length">Length</label>
-          <select class="form__input" id="ai_length" name="length">
-            <option value="">—</option>
-            {% for l in ['mini','knee','midi','maxi','floor','cropped'] %}
-            <option value="{{ l }}">{{ l | title }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="form__field">
-          <label class="form__label" for="ai_sleeves">Sleeves</label>
-          <select class="form__input" id="ai_sleeves" name="sleeves">
-            <option value="">—</option>
-            {% for s in ['sleeveless','cap','short','three-quarter','long','bishop','puff'] %}
-            <option value="{{ s }}">{{ s | title }}</option>
-            {% endfor %}
-          </select>
-        </div>
+      <div class="form__field">
+        <label class="form__label" for="ai_fabric">Fabric (type + weight + behaviour)</label>
+        <input class="form__input" type="text" id="ai_fabric" name="fabric" placeholder="e.g. silk double georgette, 14mm, soft, fluid, semi-sheer" />
       </div>
       <div class="form__field">
         <label class="form__label" for="ai_extras">Extra notes (optional)</label>
-        <textarea class="form__textarea" id="ai_extras" name="extras" rows="3" placeholder="e.g. front darts, asymmetric hem, V neckline, patch pockets…"></textarea>
+        <textarea class="form__textarea" id="ai_extras" name="extras" rows="3" placeholder="Anything else — pockets, asymmetry, hardware, references…"></textarea>
       </div>
       <div class="form__field">
         <label class="form__label" for="ai_project">Connect to project (optional)</label>
@@ -123,6 +104,19 @@
         p.classList.toggle('tab-panel--hidden', p.dataset.tab !== target);
       });
     });
+  });
+
+  document.querySelectorAll('select[data-other]').forEach(function (sel) {
+    var input = sel.parentElement.querySelector('input.form__input--other');
+    if (!input) return;
+    function sync() {
+      var show = sel.value === 'other';
+      input.hidden = !show;
+      input.required = show;
+      if (!show) input.value = '';
+    }
+    sel.addEventListener('change', sync);
+    sync();
   });
 </script>
 {% endblock %}

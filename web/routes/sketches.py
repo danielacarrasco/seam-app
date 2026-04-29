@@ -67,33 +67,60 @@ def generate():
 
 @bp.route("/ai-generate", methods=["POST"])
 def ai_generate():
-    parts = []
-    garment = (request.form.get("garment_type") or "").strip()
-    silhouette = (request.form.get("silhouette") or "").strip()
-    color = (request.form.get("color") or "").strip()
-    fabric = (request.form.get("fabric") or "").strip()
-    length = (request.form.get("length") or "").strip()
-    sleeves = (request.form.get("sleeves") or "").strip()
+    def field(name):
+        val = (request.form.get(name) or "").strip()
+        if val.lower() == "other":
+            return (request.form.get(name + "_other") or "").strip()
+        return val
+
+    garment = field("garment_type")
+    silhouette = field("silhouette")
+    length = field("length")
+    neckline = field("neckline")
+    armholes = field("sleeves")
+    waist = field("waist_shaping")
+    back = field("back_design")
+    fabric = field("fabric")
+    color = field("color")
     extras = (request.form.get("extras") or "").strip()
 
-    descriptor_parts = [p for p in [silhouette, color, fabric] if p]
-    descriptor = " ".join(descriptor_parts)
-    if garment:
-        parts.append(f"{descriptor + ' ' if descriptor else ''}{garment}".strip())
-    elif descriptor:
-        parts.append(descriptor)
-
-    if length:
-        parts.append(f"{length} length")
-    if sleeves:
-        parts.append(f"{sleeves} sleeves")
-    if extras:
-        parts.append(extras)
-
-    if not parts:
-        flash("Pick at least one option or add notes.", "error")
+    if not garment:
+        flash("Pick a garment type (or use Other to describe one).", "error")
         return redirect(url_for("sketches.new"))
-    prompt = ". ".join(parts) + "."
+
+    fabric_line = f"{color} {fabric}".strip() if color or fabric else ""
+
+    lines = [
+        f"Create a clean editorial fashion sketch of a {garment} designed for a female body.",
+        "The garment should have:",
+    ]
+    if silhouette:
+        lines.append(f"Silhouette: {silhouette}")
+    if length:
+        lines.append(f"Length: {length}")
+    if neckline:
+        lines.append(f"Neckline: {neckline}")
+    if armholes:
+        lines.append(f"Armholes/sleeves: {armholes}")
+    if waist:
+        lines.append(f"Waist shaping: {waist}")
+    if back:
+        lines.append(f"Back design: {back}")
+    if fabric_line:
+        lines.append(f"Fabric: {fabric_line}")
+    if extras:
+        lines.append(extras)
+
+    lines.extend([
+        "Show how the fabric behaves (drape, stiffness, folds, transparency).",
+        "Style: minimal, modern, slightly architectural, similar to high-end "
+        "ready-to-wear (e.g. Akris / Scanlan Theodore aesthetic).",
+        "Output: front and back views; clean fashion illustration (no face "
+        "detail, focus on garment); light shading to indicate structure and "
+        "fabric movement; neutral background.",
+    ])
+
+    prompt = "\n".join(lines)
     return _post_generate(prompt, request.form.get("project_id"))
 
 

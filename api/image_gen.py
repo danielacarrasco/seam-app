@@ -29,16 +29,11 @@ def generate_fashion_sketch(prompt: str) -> bytes:
     model = os.getenv("OPENAI_IMAGE_MODEL", "gpt-image-1")
     size = os.getenv("OPENAI_IMAGE_SIZE", "1024x1024")
 
-    framed = (
-        "A clean editorial fashion illustration, front-facing flat sketch on a "
-        f"plain off-white background. {prompt.strip()}"
-    )
-
     try:
         client = OpenAI(api_key=api_key)
         response = client.images.generate(
             model=model,
-            prompt=framed,
+            prompt=prompt.strip(),
             size=size,
             n=1,
         )
