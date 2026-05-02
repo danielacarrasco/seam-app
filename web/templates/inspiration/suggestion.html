@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}{{ suggestion.title }} · Seam{% endblock %}
+{% block content %}
+<div class="detail-page detail-page--journal">
+  <div class="detail-page__header">
+    <div>
+      <p class="breadcrumb"><a href="{{ url_for('inspiration.index') }}">Inspiration</a></p>
+      <h1 class="page-title">{{ suggestion.title }}</h1>
+      {% if suggestion.silhouette or suggestion.garment_type %}
+      <p class="page-subtitle">
+        {% if suggestion.silhouette %}{{ suggestion.silhouette }}{% endif %}
+        {% if suggestion.silhouette and suggestion.garment_type %} · {% endif %}
+        {% if suggestion.garment_type %}{{ suggestion.garment_type | title }}{% endif %}
+      </p>
+      {% endif %}
+    </div>
+    <div class="detail-page__actions">
+      <a href="{{ url_for('inspiration.index') }}" class="btn btn--ghost">← Back to library</a>
+    </div>
+  </div>
+
+  <article class="suggestion-card suggestion-card--full">
+    {% if suggestion.mood %}
+    <div class="suggestion-card__group">
+      <p class="suggestion-card__label">Mood</p>
+      <div class="chip-row">{% for m in suggestion.mood %}<span class="chip chip--neutral chip--sm">{{ m }}</span>{% endfor %}</div>
+    </div>
+    {% endif %}
+    {% if suggestion.palette %}
+    <div class="suggestion-card__group">
+      <p class="suggestion-card__label">Palette</p>
+      <div class="chip-row">{% for c in suggestion.palette %}<span class="chip chip--neutral chip--sm">{{ c }}</span>{% endfor %}</div>
+    </div>
+    {% endif %}
+    {% if suggestion.imagery %}
+    <div class="suggestion-card__group">
+      <p class="suggestion-card__label">Imagery</p>
+      <div class="chip-row">{% for i in suggestion.imagery %}<span class="chip chip--neutral chip--sm">{{ i }}</span>{% endfor %}</div>
+    </div>
+    {% endif %}
+    {% if suggestion.fabric_ideas %}
+    <div class="suggestion-card__group">
+      <p class="suggestion-card__label">Fabric direction</p>
+      <ul class="suggestion-card__list">{% for f in suggestion.fabric_ideas %}<li>{{ f }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if suggestion.pattern_features %}
+    <div class="suggestion-card__group">
+      <p class="suggestion-card__label">Pattern features</p>
+      <ul class="suggestion-card__list">{% for p in suggestion.pattern_features %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if suggestion.fit_considerations %}
+    <div class="suggestion-card__group">
+      <p class="suggestion-card__label">Fit considerations</p>
+      <ul class="suggestion-card__list">{% for f in suggestion.fit_considerations %}<li>{{ f }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if suggestion.construction_notes %}
+    <div class="suggestion-card__group">
+      <p class="suggestion-card__label">Construction direction</p>
+      <ul class="suggestion-card__list">{% for c in suggestion.construction_notes %}<li>{{ c }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+    {% if suggestion.rationale %}
+    <p class="suggestion-card__rationale">{{ suggestion.rationale }}</p>
+    {% endif %}
+
+    <footer class="suggestion-card__actions">
+      <form method="post" action="{{ url_for('inspiration.create_project_from_suggestion', suggestion_id=suggestion.id) }}">
+        <button type="submit" class="btn btn--primary">Create project</button>
+      </form>
+      {% if suggestion.sketch_prompt %}
+      <form method="post" action="{{ url_for('inspiration.generate_sketch_from_suggestion', suggestion_id=suggestion.id) }}">
+        <button type="submit" class="btn btn--secondary">Generate sketch</button>
+      </form>
+      {% endif %}
+    </footer>
+  </article>
+
+  {% if sources %}
+  <section class="detail-section">
+    <h2 class="section-label">Inspired by</h2>
+    <div class="inspiration-grid">
+      {% for entry in sources %}
+      <div class="inspiration-card inspiration-card--readonly">
+        {% if entry.image_url %}
+        <div class="inspiration-card__img"><img src="{{ entry.image_url }}" alt="" /></div>
+        {% endif %}
+        <div class="inspiration-card__body">
+          <div class="inspiration-card__head">
+            <span class="chip chip--neutral chip--sm">{{ entry.entry_type | title }}</span>
+            <span class="inspiration-card__date">{{ entry.created_at[:10] }}</span>
+          </div>
+          {% if entry.title %}<h3 class="inspiration-card__title">{{ entry.title }}</h3>{% endif %}
+          {% if entry.body %}<p class="inspiration-card__excerpt">{{ entry.body[:200] }}{% if entry.body|length > 200 %}…{% endif %}</p>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

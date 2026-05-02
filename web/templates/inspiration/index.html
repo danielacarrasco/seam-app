@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Inspiration · Seam{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Inspiration Library</h1>
+    <p class="muted">Collect dreams, thoughts, images and fragments — then turn them into garment ideas.</p>
+  </div>
+  <a href="{{ url_for('inspiration.new') }}" class="btn btn--primary">+ New entry</a>
+</div>
+
+{% if entries %}
+<form method="post" action="{{ url_for('inspiration.generate') }}" id="generate-form">
+  <div class="selection-bar">
+    <span class="selection-bar__count muted" id="selection-count">Select entries to combine.</span>
+    <button type="submit" class="btn btn--primary" id="generate-btn"
+      {% if not ai_configured %}disabled title="AI project suggestions are not configured for this deployment."{% endif %}>
+      Generate project from selection
+    </button>
+  </div>
+  {% if not ai_configured %}
+  <p class="muted">AI project suggestions are not configured for this deployment.</p>
+  {% endif %}
+
+  <div class="inspiration-grid">
+    {% for entry in entries %}
+    <div class="inspiration-card">
+      <label class="inspiration-card__select">
+        <input type="checkbox" name="entry_ids" value="{{ entry.id }}" />
+        <span class="inspiration-card__check"></span>
+      </label>
+      {% if entry.image_url %}
+      <div class="inspiration-card__img">
+        <img src="{{ entry.image_url }}" alt="" loading="lazy" />
+      </div>
+      {% endif %}
+      <div class="inspiration-card__body">
+        <div class="inspiration-card__head">
+          <span class="chip chip--neutral chip--sm">{{ entry.entry_type | title }}</span>
+          <span class="inspiration-card__date">{{ entry.created_at[:10] }}</span>
+        </div>
+        {% if entry.title %}<h2 class="inspiration-card__title">{{ entry.title }}</h2>{% endif %}
+        {% if entry.body %}
+          <p class="inspiration-card__excerpt">{{ entry.body[:220] }}{% if entry.body|length > 220 %}…{% endif %}</p>
+        {% elif not entry.image_url %}
+          <p class="muted">Empty entry.</p>
+        {% endif %}
+        {% if entry.tags %}
+        <div class="chip-row">
+          {% for t in entry.tags[:5] %}<span class="chip chip--neutral chip--sm">{{ t }}</span>{% endfor %}
+        </div>
+        {% endif %}
+        <div class="inspiration-card__foot">
+          <a href="{{ url_for('inspiration.edit', entry_id=entry.id) }}" class="btn-inline">Edit</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</form>
+
+<script>
+  (function () {
+    var form = document.getElementById('generate-form');
+    var count = document.getElementById('selection-count');
+    var btn = document.getElementById('generate-btn');
+    var aiOff = btn.disabled;
+    function update() {
+      var n = form.querySelectorAll('input[name="entry_ids"]:checked').length;
+      if (n === 0) {
+        count.textContent = 'Select entries to combine.';
+        if (!aiOff) btn.disabled = true;
+      } else {
+        count.textContent = n + ' selected';
+        if (!aiOff) btn.disabled = false;
+      }
+    }
+    form.addEventListener('change', update);
+    update();
+  })();
+</script>
+{% else %}
+  {% set message = "Nothing here yet — start with one fragment." %}
+  {% set cta_url = url_for('inspiration.new') %}
+  {% set cta_label = "+ New entry" %}
+  {% include 'partials/empty_state.html' %}
+{% endif %}
+{% endblock %}

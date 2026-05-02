@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Edit entry · Seam{% endblock %}
+{% block content %}
+<div class="form-page form-page--narrow">
+  <p class="breadcrumb"><a href="{{ url_for('inspiration.index') }}">Inspiration</a></p>
+  <h1 class="page-title">Edit entry</h1>
+  <form method="post" action="{{ url_for('inspiration.update', entry_id=entry.id) }}" enctype="multipart/form-data" class="form journal-form">
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="title">Title</label>
+        <input class="form__input" type="text" id="title" name="title" value="{{ entry.title or '' }}" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="entry_type">Type</label>
+        <select class="form__input" id="entry_type" name="entry_type">
+          {% for t in entry_types %}
+          <option value="{{ t }}" {% if t == entry.entry_type %}selected{% endif %}>{{ t | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="body">Text</label>
+      <textarea class="form__textarea form__textarea--journal" id="body" name="body" rows="10">{{ entry.body or '' }}</textarea>
+    </div>
+    {% if entry.image_url %}
+    <div class="form__field">
+      <label class="form__label">Current image</label>
+      <img src="{{ entry.image_url }}" alt="" class="sketch-thumb" style="max-width:240px;" />
+    </div>
+    {% endif %}
+    <div class="form__field">
+      <label class="form__label" for="image">Replace image (optional)</label>
+      <input class="form__input" type="file" id="image" name="image" accept="image/*" />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="tags">Tags</label>
+      <input class="form__input" type="text" id="tags" name="tags" value="{{ entry.tags | join(', ') }}" />
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Save changes</button>
+      <a href="{{ url_for('inspiration.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+  <form method="post" action="{{ url_for('inspiration.delete', entry_id=entry.id) }}"
+        onsubmit="return confirm('Delete this entry?')" style="margin-top: 16px;">
+    <button type="submit" class="btn btn--danger">Delete entry</button>
+  </form>
+</div>
+{% endblock %}

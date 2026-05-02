@@ -5,7 +5,7 @@ from flask import Flask
 
 from web.routes import (
     home,
-    journal,
+    inspiration,
     makes,
     measurements,
     patterns,
@@ -28,7 +28,7 @@ def create_app() -> Flask:
     app.register_blueprint(makes.bp, url_prefix="/makes")
     app.register_blueprint(measurements.bp, url_prefix="/measurements")
     app.register_blueprint(sketches.bp, url_prefix="/sketches")
-    app.register_blueprint(journal.bp, url_prefix="/journal")
+    app.register_blueprint(inspiration.bp, url_prefix="/inspiration")
 
     return app
 

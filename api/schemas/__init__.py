@@ -39,12 +39,12 @@ from api.schemas.measurement import (
     FitNoteRead,
 )
 from api.schemas.sketch import SketchGenerate, SketchRead, SketchUpdate
-from api.schemas.journal import (
-    JournalEntryCreate,
-    JournalEntryRead,
-    JournalEntrySummary,
-    JournalEntryUpdate,
-    JournalSuggestionRead,
+from api.schemas.inspiration import (
+    GenerateSuggestionRequest,
+    InspirationEntryCreate,
+    InspirationEntryRead,
+    InspirationEntryUpdate,
+    InspirationSuggestionRead,
 )
 
 __all__ = [
@@ -81,9 +81,9 @@ __all__ = [
     "SketchGenerate",
     "SketchRead",
     "SketchUpdate",
-    "JournalEntryCreate",
-    "JournalEntryRead",
-    "JournalEntrySummary",
-    "JournalEntryUpdate",
-    "JournalSuggestionRead",
+    "GenerateSuggestionRequest",
+    "InspirationEntryCreate",
+    "InspirationEntryRead",
+    "InspirationEntryUpdate",
+    "InspirationSuggestionRead",
 ]
