@@ -9,6 +9,7 @@ from api.models.measurement import (
     FitNote,
 )
 from api.models.sketch import Sketch
+from api.models.journal import JournalEntry, JournalProjectSuggestion
 
 __all__ = [
     "Project",
@@ -24,4 +25,6 @@ __all__ = [
     "Alteration",
     "FitNote",
     "Sketch",
+    "JournalEntry",
+    "JournalProjectSuggestion",
 ]
