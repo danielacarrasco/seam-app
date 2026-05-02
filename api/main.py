@@ -8,7 +8,15 @@ from sqlalchemy import inspect, text
 
 from api import models  # noqa: F401  -- register models with Base.metadata
 from api.database import Base, engine
-from api.routers import fabrics, journal, makes, measurements, patterns, projects, sketches
+from api.routers import (
+    fabrics,
+    inspiration,
+    makes,
+    measurements,
+    patterns,
+    projects,
+    sketches,
+)
 from api.storage import MEDIA_URL_PREFIX, ensure_upload_dir
 
 Base.metadata.create_all(bind=engine)
@@ -60,9 +68,11 @@ app.include_router(patterns.router, prefix="/patterns", tags=["patterns"])
 app.include_router(measurements.router, prefix="/measurements", tags=["measurements"])
 app.include_router(makes.router, prefix="/makes", tags=["makes"])
 app.include_router(sketches.router, prefix="/sketches", tags=["sketches"])
-app.include_router(journal.router, prefix="/journal", tags=["journal"])
+app.include_router(inspiration.router, prefix="/inspiration", tags=["inspiration"])
 app.include_router(
-    journal.sugg_router, prefix="/journal-suggestions", tags=["journal"]
+    inspiration.sugg_router,
+    prefix="/inspiration-suggestions",
+    tags=["inspiration"],
 )
 
 

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}New inspiration · Seam{% endblock %}
+{% block content %}
+<div class="form-page form-page--narrow">
+  <p class="breadcrumb"><a href="{{ url_for('inspiration.index') }}">Inspiration</a></p>
+  <h1 class="page-title">New entry</h1>
+  <p class="muted">Words, an image, or both. Anything you might want to combine later.</p>
+  <form method="post" action="{{ url_for('inspiration.create') }}" enctype="multipart/form-data" class="form journal-form">
+    <div class="form__row">
+      <div class="form__field">
+        <label class="form__label" for="title">Title (optional)</label>
+        <input class="form__input" type="text" id="title" name="title" placeholder="A line, a feeling, a place…" />
+      </div>
+      <div class="form__field">
+        <label class="form__label" for="entry_type">Type</label>
+        <select class="form__input" id="entry_type" name="entry_type">
+          {% for t in entry_types %}
+          <option value="{{ t }}" {% if t == 'note' %}selected{% endif %}>{{ t | title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="body">Text (optional if you upload an image)</label>
+      <textarea class="form__textarea form__textarea--journal" id="body" name="body" rows="10" placeholder="A dream, a colour, a mood, a fabric memory…"></textarea>
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="image">Image (optional if you write something)</label>
+      <input class="form__input" type="file" id="image" name="image" accept="image/*" />
+    </div>
+    <div class="form__field">
+      <label class="form__label" for="tags">Tags (comma-separated, optional)</label>
+      <input class="form__input" type="text" id="tags" name="tags" placeholder="e.g. coastal, soft, structured" />
+    </div>
+    <div class="form__actions">
+      <button type="submit" class="btn btn--primary">Save</button>
+      <a href="{{ url_for('inspiration.index') }}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
