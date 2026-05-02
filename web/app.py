@@ -3,7 +3,16 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 
-from web.routes import home, makes, measurements, patterns, projects, sketches, stash
+from web.routes import (
+    home,
+    journal,
+    makes,
+    measurements,
+    patterns,
+    projects,
+    sketches,
+    stash,
+)
 
 load_dotenv()
 
@@ -19,6 +28,7 @@ def create_app() -> Flask:
     app.register_blueprint(makes.bp, url_prefix="/makes")
     app.register_blueprint(measurements.bp, url_prefix="/measurements")
     app.register_blueprint(sketches.bp, url_prefix="/sketches")
+    app.register_blueprint(journal.bp, url_prefix="/journal")
 
     return app
 

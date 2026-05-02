@@ -232,6 +232,34 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .tab-panel--hidden { display: none; }
 .form__input--other { margin-top: 6px; }
 
+/* --- Journal --- */
+.form-page--narrow { max-width: 720px; margin: 0 auto; }
+.form__textarea--journal { font-family: var(--font-display); font-size: 18px; line-height: 1.6; padding: 16px; min-height: 280px; }
+.journal-form { background: var(--color-base); }
+.journal-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.journal-card { background: #fff; border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: block; transition: border-color 0.15s, box-shadow 0.15s; }
+.journal-card:hover { border-color: var(--color-border-med); box-shadow: var(--shadow-card); }
+.journal-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+.journal-card__date { font-size: 12px; color: var(--color-text-muted); }
+.journal-card__title { font-family: var(--font-display); font-size: 22px; font-weight: 400; line-height: 1.2; margin-bottom: 8px; }
+.journal-card__excerpt { font-size: 14px; color: var(--color-text-muted); line-height: 1.55; }
+.journal-card__foot { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.detail-section--journal { background: #fff; border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 28px; margin-bottom: 32px; }
+.journal-body { font-family: var(--font-display); font-size: 19px; line-height: 1.7; white-space: pre-wrap; margin-bottom: 16px; }
+.suggestion-actions-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.suggestion-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.suggestion-card { background: #fff; border: 0.5px solid var(--color-border); border-radius: var(--radius-lg); padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.suggestion-card__head .muted { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+.suggestion-card__title { font-family: var(--font-display); font-size: 22px; font-weight: 400; line-height: 1.2; margin-top: 4px; }
+.suggestion-card__sub { font-size: 13px; color: var(--color-text-muted); margin-top: 4px; }
+.suggestion-card__group { display: flex; flex-direction: column; gap: 6px; }
+.suggestion-card__label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); }
+.suggestion-card__list { list-style: none; font-size: 14px; line-height: 1.55; padding-left: 0; }
+.suggestion-card__list li { padding-left: 14px; position: relative; }
+.suggestion-card__list li::before { content: "·"; position: absolute; left: 4px; color: var(--color-text-muted); }
+.suggestion-card__rationale { font-style: italic; color: var(--color-text-muted); font-size: 14px; line-height: 1.6; padding-top: 8px; border-top: 0.5px solid var(--color-border); }
+.suggestion-card__actions { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 0.5px solid var(--color-border); margin-top: auto; }
+
 /* --- Pattern ref --- */
 .pattern-ref { padding: 12px; background: var(--color-surface); border-radius: var(--radius-md); margin-bottom: 8px; }
 .pattern-ref__name { font-size: 14px; font-weight: 500; color: var(--color-primary); }
