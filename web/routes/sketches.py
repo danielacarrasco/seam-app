@@ -91,7 +91,7 @@ def ai_generate():
     fabric_line = f"{color} {fabric}".strip() if color or fabric else ""
 
     lines = [
-        f"Create a clean editorial fashion sketch of a {garment} designed for a female body.",
+        f"Create a clean editorial fashion illustration of a {garment} designed for a female.",
         "The garment should have:",
     ]
     if silhouette:
@@ -113,11 +113,9 @@ def ai_generate():
 
     lines.extend([
         "Show how the fabric behaves (drape, stiffness, folds, transparency).",
-        "Style: minimal, modern, slightly architectural, similar to high-end "
-        "ready-to-wear (e.g. Akris / Scanlan Theodore aesthetic).",
-        "Output: front and back views; clean fashion illustration (no face "
-        "detail, focus on garment); light shading to indicate structure and "
-        "fabric movement; neutral background.",
+        "Style: minimal, modern, slightly architectural, similar to high-end ready-to-wear.",
+        "Output: front and back views; light shading to indicate structure and fabric movement; neutral background.",
+        "No writing.",
     ])
 
     prompt = "\n".join(lines)
