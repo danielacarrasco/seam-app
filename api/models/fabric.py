@@ -43,6 +43,8 @@ class Fabric(Base):
         Integer, ForeignKey("projects.id", ondelete="SET NULL"), nullable=True
     )
 
+    wishlist = Column(Boolean, default=False, nullable=False)
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False

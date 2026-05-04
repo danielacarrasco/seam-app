@@ -231,6 +231,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .tab--active { color: var(--color-text); border-bottom-color: var(--color-primary); font-weight: 500; }
 .tab-panel--hidden { display: none; }
 .form__input--other { margin-top: 6px; }
+.tab-bar--page { margin: 8px 0 18px; }
+a.tab { text-decoration: none; }
 
 /* --- Journal --- */
 .form-page--narrow { max-width: 720px; margin: 0 auto; }

@@ -3,9 +3,18 @@
 {% block content %}
 <div class="page-header">
   <h1 class="page-title">Stash</h1>
-  <a href="{{ url_for('stash.new') }}" class="btn btn--primary">+ Log fabric</a>
+  <a href="{{ url_for('stash.new', tab=active_tab) }}" class="btn btn--primary">
+    {% if is_wishlist %}+ Add to wishlist{% else %}+ Log fabric{% endif %}
+  </a>
 </div>
+
+<div class="tab-bar tab-bar--page">
+  <a href="{{ url_for('stash.index') }}" class="tab {% if not is_wishlist %}tab--active{% endif %}">My stash{% if not is_wishlist and own_count %} ({{ own_count }}){% elif is_wishlist and other_count %} ({{ other_count }}){% endif %}</a>
+  <a href="{{ url_for('stash.index', tab='wishlist') }}" class="tab {% if is_wishlist %}tab--active{% endif %}">Wishlist{% if is_wishlist and wishlist_count %} ({{ wishlist_count }}){% elif not is_wishlist and other_count %} ({{ other_count }}){% endif %}</a>
+</div>
+
 <form class="filter-bar" method="get">
+  {% if is_wishlist %}<input type="hidden" name="tab" value="wishlist" />{% endif %}
   <select name="fiber" class="filter-select">
     <option value="">All fibres</option>
     {% for f in ['cotton','linen','wool','silk','synthetic','blend'] %}
@@ -18,11 +27,13 @@
     <option value="{{ s }}" {% if filters.get('structure') == s %}selected{% endif %}>{{ s | title }}</option>
     {% endfor %}
   </select>
+  {% if not is_wishlist %}
   <select name="reserved" class="filter-select">
     <option value="">All</option>
     <option value="false" {% if filters.get('reserved') == 'false' %}selected{% endif %}>Available</option>
     <option value="true" {% if filters.get('reserved') == 'true' %}selected{% endif %}>Reserved</option>
   </select>
+  {% endif %}
   <select name="suitable_for" class="filter-select">
     <option value="">Any garment</option>
     {% for t in ['coat','jacket','dress','skirt','trousers','top','blouse','shirt'] %}
@@ -30,16 +41,23 @@
     {% endfor %}
   </select>
   <button type="submit" class="btn btn--secondary">Filter</button>
-  {% if filters %}<a href="{{ url_for('stash.index') }}" class="btn btn--ghost">Clear</a>{% endif %}
+  {% if filters %}<a href="{{ url_for('stash.index', tab=active_tab if is_wishlist else None) }}" class="btn btn--ghost">Clear</a>{% endif %}
 </form>
+
 {% if fabrics %}
   <div class="fabric-grid">
     {% for fabric in fabrics %}{% include 'partials/fabric_card.html' with context %}{% endfor %}
   </div>
 {% else %}
-  {% set message = "Your stash is empty — log your first fabric." %}
-  {% set cta_url = url_for('stash.new') %}
-  {% set cta_label = "+ Log fabric" %}
+  {% if is_wishlist %}
+    {% set message = "Nothing on your wishlist yet — capture fabrics you might want." %}
+    {% set cta_url = url_for('stash.new', tab='wishlist') %}
+    {% set cta_label = "+ Add to wishlist" %}
+  {% else %}
+    {% set message = "Your stash is empty — log your first fabric." %}
+    {% set cta_url = url_for('stash.new') %}
+    {% set cta_label = "+ Log fabric" %}
+  {% endif %}
   {% include 'partials/empty_state.html' %}
 {% endif %}
 {% endblock %}

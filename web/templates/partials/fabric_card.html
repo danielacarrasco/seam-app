@@ -9,8 +9,12 @@
   <div class="fabric-card__body">
     <p class="fabric-card__name">{{ fabric.nickname }}</p>
     <p class="fabric-card__meta">{{ fabric.fiber_content }} · {{ fabric.length_meters }}m</p>
+    {% if fabric.wishlist %}
+    <span class="chip chip--neutral">Wishlist</span>
+    {% else %}
     <span class="chip chip--{{ 'reserved' if fabric.reserved else 'available' }}">
       {{ 'Reserved' if fabric.reserved else 'Available' }}
     </span>
+    {% endif %}
   </div>
 </a>

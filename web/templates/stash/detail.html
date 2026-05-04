@@ -4,17 +4,26 @@
 <div class="detail-page">
   <div class="detail-page__header">
     <div>
-      <p class="breadcrumb"><a href="{{ url_for('stash.index') }}">Stash</a></p>
+      <p class="breadcrumb"><a href="{{ url_for('stash.index', tab='wishlist' if fabric.wishlist else None) }}">{% if fabric.wishlist %}Wishlist{% else %}Stash{% endif %}</a></p>
       <h1 class="page-title">{{ fabric.nickname }}</h1>
       <div class="chip-row">
-        <span class="chip chip--{{ 'reserved' if fabric.reserved else 'available' }}">{{ 'Reserved' if fabric.reserved else 'Available' }}</span>
+        {% if fabric.wishlist %}
+          <span class="chip chip--neutral">Wishlist</span>
+        {% else %}
+          <span class="chip chip--{{ 'reserved' if fabric.reserved else 'available' }}">{{ 'Reserved' if fabric.reserved else 'Available' }}</span>
+        {% endif %}
         {% if fabric.fiber_content %}<span class="chip chip--neutral">{{ fabric.fiber_content | title }}</span>{% endif %}
         {% if fabric.stretch %}<span class="chip chip--neutral">Stretch</span>{% endif %}
       </div>
     </div>
     <div class="detail-page__actions">
+      {% if fabric.wishlist %}
+      <form method="post" action="{{ url_for('stash.buy', fabric_id=fabric.id) }}">
+        <button type="submit" class="btn btn--primary">Move to stash</button>
+      </form>
+      {% endif %}
       <a href="{{ url_for('stash.edit', fabric_id=fabric.id) }}" class="btn btn--secondary">Edit</a>
-      <form method="post" action="{{ url_for('stash.delete', fabric_id=fabric.id) }}" onsubmit="return confirm('Remove this fabric from stash?')">
+      <form method="post" action="{{ url_for('stash.delete', fabric_id=fabric.id) }}" onsubmit="return confirm('Remove this fabric?')">
         <button type="submit" class="btn btn--danger">Delete</button>
       </form>
     </div>
@@ -59,6 +68,11 @@
       </section>
     </div>
     <aside class="detail-page__sidebar">
+      {% if fabric.wishlist %}
+      <section class="detail-section">
+        <p class="muted">This fabric is on your wishlist. When you buy it, click <em>Move to stash</em> to manage projects, reservations, and links.</p>
+      </section>
+      {% else %}
       <section class="detail-section">
         <h2 class="section-label">Used in projects</h2>
         {% if used_in %}
@@ -112,6 +126,7 @@
           {% endfor %}
         </ul>
       </section>
+      {% endif %}
       {% endif %}
     </aside>
   </div>

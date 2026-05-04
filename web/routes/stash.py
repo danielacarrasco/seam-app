@@ -8,15 +8,34 @@ API = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 @bp.route("/")
 def index():
-    params = {k: v for k, v in request.args.items() if v}
+    tab = request.args.get("tab", "stash")
+    is_wishlist = tab == "wishlist"
+    params = {k: v for k, v in request.args.items() if v and k != "tab"}
+    params["wishlist"] = "true" if is_wishlist else "false"
     resp = requests.get(f"{API}/fabrics/", params=params)
     fabrics = resp.json() if resp.ok else []
-    return render_template("stash/index.html", fabrics=fabrics, filters=params)
+    # Counts for the tab badges; cheap second call.
+    other = requests.get(
+        f"{API}/fabrics/",
+        params={"wishlist": "false" if is_wishlist else "true"},
+    )
+    other_count = len(other.json()) if other.ok else 0
+    return render_template(
+        "stash/index.html",
+        fabrics=fabrics,
+        filters={k: v for k, v in params.items() if k != "wishlist"},
+        active_tab=tab,
+        is_wishlist=is_wishlist,
+        other_count=other_count,
+        own_count=len(fabrics) if not is_wishlist else other_count,
+        wishlist_count=len(fabrics) if is_wishlist else other_count,
+    )
 
 
 @bp.route("/new")
 def new():
-    return render_template("stash/new.html")
+    wishlist = request.args.get("tab") == "wishlist"
+    return render_template("stash/new.html", default_wishlist=wishlist)
 
 
 @bp.route("/", methods=["POST"])
@@ -38,6 +57,7 @@ def create():
         "date_acquired": request.form.get("date_acquired"),
         "suitable_garment_types": request.form.getlist("suitable_garment_types"),
         "notes": request.form.get("notes"),
+        "wishlist": request.form.get("wishlist") == "on",
     }
     data = {k: (None if v == "" else v) for k, v in data.items()}
     resp = requests.post(f"{API}/fabrics/", json=data)
@@ -49,10 +69,23 @@ def create():
                 f"{API}/fabrics/{fabric.get('id')}/photo",
                 files={"file": (photo.filename, photo.stream, photo.content_type)},
             )
-        flash("Fabric added to stash.", "success")
+        flash(
+            "Added to wishlist." if data.get("wishlist") else "Fabric added to stash.",
+            "success",
+        )
         return redirect(url_for("stash.detail", fabric_id=fabric.get("id")))
     flash("Something went wrong. Please try again.", "error")
     return redirect(url_for("stash.new"))
+
+
+@bp.route("/<int:fabric_id>/buy", methods=["POST"])
+def buy(fabric_id):
+    resp = requests.post(f"{API}/fabrics/{fabric_id}/buy")
+    if resp.ok:
+        flash("Moved to your stash.", "success")
+    else:
+        flash("Could not move fabric.", "error")
+    return redirect(url_for("stash.detail", fabric_id=fabric_id))
 
 
 @bp.route("/<int:fabric_id>")
