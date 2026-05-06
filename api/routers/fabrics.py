@@ -25,9 +25,10 @@ def list_fabrics(
     reserved: Optional[bool] = None,
     suitable_for: Optional[str] = None,
     min_length: Optional[float] = None,
+    wishlist: bool = False,
     db: Session = Depends(get_db),
 ):
-    q = db.query(Fabric)
+    q = db.query(Fabric).filter(Fabric.wishlist == wishlist)
     if fiber:
         q = q.filter(Fabric.fiber_content.ilike(f"%{fiber}%"))
     if color:
@@ -72,8 +73,25 @@ def update_fabric(fabric_id: int, payload: FabricUpdate, db: Session = Depends(g
     fabric = db.get(Fabric, fabric_id)
     if not fabric:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"Fabric {fabric_id} not found")
-    for field, value in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump(exclude_unset=True)
+    for field, value in data.items():
         setattr(fabric, field, value)
+    if fabric.wishlist:
+        # wishlist items can't hold a reservation
+        fabric.reserved = False
+        fabric.reserved_project_id = None
+    db.commit()
+    db.refresh(fabric)
+    return _serialize(fabric)
+
+
+@router.post("/{fabric_id}/buy", response_model=FabricRead)
+def buy_fabric(fabric_id: int, db: Session = Depends(get_db)):
+    """Move a wishlist fabric into the main stash."""
+    fabric = db.get(Fabric, fabric_id)
+    if not fabric:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"Fabric {fabric_id} not found")
+    fabric.wishlist = False
     db.commit()
     db.refresh(fabric)
     return _serialize(fabric)
@@ -130,6 +148,11 @@ def reserve_for_project(
     project = db.get(Project, project_id)
     if not project:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"Project {project_id} not found")
+    if fabric.wishlist:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Wishlist fabrics can't be reserved — buy it first.",
+        )
     fabric.reserved = True
     fabric.reserved_project_id = project_id
     db.commit()

@@ -30,6 +30,7 @@ def _ensure_columns():
     """
     desired = {
         "makes": {"rating": "FLOAT"},
+        "fabrics": {"wishlist": "BOOLEAN NOT NULL DEFAULT 0"},
     }
     inspector = inspect(engine)
     with engine.connect() as conn:

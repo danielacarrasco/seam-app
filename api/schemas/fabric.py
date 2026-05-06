@@ -24,10 +24,12 @@ class FabricBase(BaseModel):
 
 class FabricCreate(FabricBase):
     nickname: str = Field(..., min_length=1, max_length=200)
+    wishlist: bool = False
 
 
 class FabricUpdate(FabricBase):
     reserved: Optional[bool] = None
+    wishlist: Optional[bool] = None
 
 
 class _ReservedProjectRef(BaseModel):
@@ -45,6 +47,7 @@ class FabricSummary(BaseModel):
     color: Optional[str] = None
     length_meters: Optional[float] = None
     reserved: bool
+    wishlist: bool = False
     photo_url: Optional[str] = None
 
 
@@ -71,5 +74,6 @@ class FabricRead(BaseModel):
     photo_url: Optional[str] = None
     reserved: bool
     reserved_project: Optional[_ReservedProjectRef] = None
+    wishlist: bool = False
     created_at: datetime
     updated_at: datetime
